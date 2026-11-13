@@ -30,7 +30,7 @@ export default function AuthForm({ mode, u, t }) {
   return (
     <main className="p-auth">
       <form className="p-auth-card" onSubmit={submit}>
-        <img src="/img/logo-branco.png" alt="Grupo Forte" width="150" height="43" />
+        <img src="/img/logo-azul.png" alt="Grupo Forte" width="206" height="26" />
         <h1>{titles[mode][0]}</h1>
         <p className="p-muted">{titles[mode][1]}</p>
         {done ? (

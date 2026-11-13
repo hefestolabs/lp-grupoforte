@@ -236,27 +236,24 @@
 .painel .ed-page { display: none; }
 @media (max-width: 1100px) { .painel .ed-page { display: block; } }
 
-/* ================= Telas de acesso: cartão escuro com brilho laranja ================= */
-.p-auth { position: relative; overflow: hidden; background: #08090b; }
-.p-auth::before { content: ''; position: absolute; inset: 0; background: radial-gradient(60% 50% at 50% 0%, rgba(0, 59, 110, 0.35), transparent 70%); pointer-events: none; }
-.p-auth-card { position: relative; overflow: hidden; max-width: 392px; padding: 40px 34px 34px; border: 1px solid rgba(255, 255, 255, 0.09); border-radius: 28px; background: linear-gradient(180deg, rgba(255, 255, 255, 0.055), rgba(255, 255, 255, 0.02)) #101114; box-shadow: 0 30px 80px rgba(0, 0, 0, 0.6); color: #f4f5f7; }
-.p-auth-card::before { content: ''; position: absolute; right: -90px; top: -110px; width: 320px; height: 320px; border-radius: 50%; background: radial-gradient(circle, rgba(238, 115, 2, 0.5), rgba(238, 115, 2, 0.12) 45%, transparent 70%); filter: blur(8px); pointer-events: none; }
-.p-auth-card > * { position: relative; }
-.p-auth-card img { width: 132px; margin-bottom: 28px; }
-.painel .p-auth-card h1 { font-size: 27px; letter-spacing: -0.02em; color: #fff; }
-.p-auth-card .p-muted { margin: 8px 0 22px; color: #a2a7b0; }
+/* ================= Telas de acesso — paleta do Grupo Forte ================= */
+/* Fundo azul-marinho da marca com a textura dos painéis do site; cartão claro; ações em laranja. */
+.p-auth { position: relative; overflow: hidden; background: linear-gradient(rgba(0, 59, 110, 0.72), rgba(0, 43, 82, 0.88)), url(/img/bg-soft.jpg) center / cover no-repeat #003b6e; }
+.p-auth::before { content: ''; position: absolute; left: -12%; bottom: -30%; width: 60vw; height: 60vw; max-width: 760px; max-height: 760px; border-radius: 50%; background: radial-gradient(circle, rgba(252, 106, 4, 0.28), transparent 65%); pointer-events: none; }
+.p-auth::after { content: ''; position: absolute; right: -8%; top: -25%; width: 46vw; height: 46vw; max-width: 600px; max-height: 600px; border-radius: 50%; background: radial-gradient(circle, rgba(255, 255, 255, 0.1), transparent 65%); pointer-events: none; }
+.p-auth-card { position: relative; z-index: 1; overflow: hidden; max-width: 408px; padding: 44px 36px 36px; border: 0; border-radius: 22px; background: #f4f4f4; box-shadow: 0 30px 70px rgba(0, 20, 45, 0.45); color: #333; }
+.p-auth-card::before { content: ''; position: absolute; left: 0; right: 0; top: 0; height: 6px; background: linear-gradient(90deg, #fc6a04, #ee7302 55%, #ffb000); }
+.p-auth-card img { width: 176px; margin: 0 0 30px; }
+.painel .p-auth-card h1 { font-size: 26px; color: #003b6e; letter-spacing: -0.01em; }
+.p-auth-card .p-muted { margin: 6px 0 24px; color: #5d6b7a; }
 .p-auth-card label { margin-top: 12px; }
-.painel .p-auth-card input { margin: 0; padding: 15px 16px; border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 14px; background: rgba(255, 255, 255, 0.06); color: #fff; }
-.painel .p-auth-card input::placeholder { color: #8b919b; }
-.painel .p-auth-card input:focus { outline: 2px solid #ff9a3d; outline-offset: 0; border-color: transparent; background: rgba(255, 255, 255, 0.09); }
-.painel .p-auth-card input:-webkit-autofill { -webkit-text-fill-color: #fff; box-shadow: 0 0 0 100px #1b1d22 inset; caret-color: #fff; }
-.p-auth-forgot { display: block; margin-top: 14px; color: #ffb27a; font-size: 14px; font-weight: 600; text-align: right; }
-.p-auth-forgot:hover, .p-auth-card .p-auth-link:hover { text-decoration: underline; }
-.p-auth-card .p-btn--primary { min-height: 52px; margin-top: 18px; border: 0; border-radius: 14px; background: #fff; color: #0b0c0e; font-size: 16px; font-weight: 700; }
-.p-auth-card .p-btn--primary:hover:not(:disabled) { background: #e7e9ee; border: 0; }
-.p-auth-card .p-auth-link { color: #ffb27a; text-decoration: none; }
-.p-auth-card .p-help { color: #8b919b; }
-.p-auth-card .p-error { padding: 10px 12px; border-radius: 10px; background: rgba(255, 99, 82, 0.14); color: #ff9d92; }
-.p-auth-card .p-ok { background: rgba(60, 200, 120, 0.14); color: #8be0ad; }
-@media (max-width: 480px) { .p-auth { padding: 16px; } .p-auth-card { padding: 32px 22px 26px; border-radius: 24px; } }
-.p-auth-card img { margin-left: -12px; }
+.painel .p-auth-card input { margin: 0; padding: 15px 16px; border: 1px solid #d5dbe2; border-radius: 12px; background: #fff; color: #1d2733; }
+.painel .p-auth-card input::placeholder { color: #7a8794; }
+.painel .p-auth-card input:focus { outline: 2px solid #ee7302; outline-offset: 0; border-color: transparent; }
+.p-auth-forgot { display: block; margin-top: 14px; color: #003b6e; font-size: 14px; font-weight: 600; text-align: right; }
+.p-auth-forgot:hover, .p-auth-card .p-auth-link:hover { color: #c95f00; text-decoration: underline; }
+.p-auth-card .p-btn--primary { min-height: 52px; margin-top: 18px; border: 0; border-radius: 12px; background: #fc6a04; color: #fff; font-family: var(--font-head); font-size: 15px; font-weight: 700; letter-spacing: 1.2px; text-transform: uppercase; }
+.p-auth-card .p-btn--primary:hover:not(:disabled) { background: #003b6e; border: 0; }
+.p-auth-card .p-auth-link { color: #003b6e; text-decoration: none; }
+.p-auth-card .p-error { padding: 10px 12px; border-radius: 10px; background: #fdecea; }
+@media (max-width: 480px) { .p-auth { padding: 16px; } .p-auth-card { padding: 38px 24px 28px; border-radius: 18px; } }
