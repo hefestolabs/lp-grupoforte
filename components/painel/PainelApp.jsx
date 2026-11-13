@@ -43,7 +43,7 @@ export default function PainelApp({ storeMode, user, schema, initialContent, ini
   }
   async function logout() { await api('logout', { method: 'POST' }).catch(() => {}); window.location.href = '/painel/login/'; }
 
-  const nav = [['inicio', 'Visão geral'], ...schema.map((s) => [s.id, s.titulo]), ['noticias', 'Notícias'], ['acessos', 'Acessos'], ['email', 'E-mail (Resend)'], ['senha', 'Minha conta']];
+  const nav = [['inicio', 'Visão geral'], ...schema.map((s) => [s.id, s.titulo]), ['noticias', 'Notícias'], ...(user.admin ? [['acessos', 'Acessos'], ['email', 'E-mail (Resend)']] : []), ['senha', 'Minha conta']];
 
   return (
     <div className="p-app">
@@ -86,8 +86,8 @@ export default function PainelApp({ storeMode, user, schema, initialContent, ini
         ) : null}
 
         {tab === 'noticias' ? <Noticias posts={posts} setPosts={setPosts} notify={notify} /> : null}
-        {tab === 'acessos' ? <Acessos users={users} setUsers={setUsers} me={user} notify={notify} go={go} /> : null}
-        {tab === 'email' ? <Email me={user} notify={notify} go={go} /> : null}
+        {user.admin && tab === 'acessos' ? <Acessos users={users} setUsers={setUsers} me={user} notify={notify} go={go} /> : null}
+        {user.admin && tab === 'email' ? <Email me={user} notify={notify} go={go} /> : null}
         {tab === 'senha' ? <Conta me={user} locked={locked} notify={notify} /> : null}
       </main>
 
@@ -104,7 +104,7 @@ function Inicio({ go, posts, schema, user }) {
       <div className="p-tiles">
         <button type="button" className="p-tile p-tile--destaque" onClick={() => go('noticias')}><b>Notícias</b><span>{publicadas} publicada{publicadas === 1 ? '' : 's'} · criar, editar e remover</span></button>
         {schema.map((s) => <button type="button" className="p-tile" key={s.id} onClick={() => go(s.id)}><b>{s.titulo}</b><span>{s.grupos.map((g) => g.titulo).join(' · ')}</span></button>)}
-        <button type="button" className="p-tile" onClick={() => go('acessos')}><b>Acessos</b><span>Quem pode entrar no painel</span></button>
+        {user.admin ? <button type="button" className="p-tile" onClick={() => go('acessos')}><b>Acessos</b><span>Quem pode entrar no painel</span></button> : null}
       </div>
     </>
   );
@@ -192,11 +192,11 @@ function Acessos({ users, setUsers, me, notify, go }) {
   }
   return (
     <>
-      <header className="p-head"><h1>Acessos</h1><p className="p-muted">Cada pessoa entra com o próprio e-mail e senha.</p></header>
+      <header className="p-head"><h1>Acessos</h1><p className="p-muted">Cada pessoa entra com o próprio e-mail e senha. Os acessos criados aqui só editam o conteúdo: não veem esta tela nem a de E-mail (Resend).</p></header>
       <div className="p-card p-card--open">
         {users.map((u) => (
           <div className="p-row p-row--static" key={u.id}>
-            <span className="p-row-main"><b>{u.name}{u.id === me.id ? ' (você)' : ''}</b><small>{u.email || `${u.username} · sem e-mail cadastrado`}{u.mustChange ? ' · ainda com senha provisória' : ''}</small></span>
+            <span className="p-row-main"><b>{u.name}{u.id === me.id ? ' (você)' : ''}{u.admin ? ' · administrador' : ''}</b><small>{u.email || `${u.username} · sem e-mail cadastrado`}{u.mustChange ? ' · ainda com senha provisória' : ''}</small></span>
             {u.id !== me.id ? <button type="button" className="p-btn p-btn--ghost" onClick={() => remover(u)}>Remover</button> : null}
           </div>
         ))}
