@@ -90,6 +90,12 @@ export default function SobreNos() {
                 <span><b>Simone Bianchini</b>CEO</span>
               </figcaption>
             </figure>
+            {/* Área de exemplo: trocar por <a href="link do YouTube"> e pela capa real quando o vídeo existir */}
+            <div className="lider-video lider-video--exemplo" data-reveal role="img" aria-label="Vídeo de Simone Bianchini, CEO do Grupo Forte (em breve)">
+              <img className="lider-exemplo-foto" src="/img/lider-simone.png" alt="" loading="lazy" />
+              <span className="lider-play"><Icon name="e-eicon-play" size={24} /></span>
+              <span className="lider-exemplo-legenda"><b>Simone Bianchini</b>Vídeo em breve</span>
+            </div>
           </div>
         </div>
       </section>

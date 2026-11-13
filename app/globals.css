@@ -712,6 +712,18 @@ button { font: inherit; cursor: pointer; }
   .lider-video { border-radius: 20px; }
 }
 
+/* Sobre nós: área de exemplo para o vídeo da Simone (mesmo formato do vídeo do May) */
+.lider-video--exemplo { background: linear-gradient(160deg, #0d4f8f 0%, var(--navy) 45%, #062744 100%); }
+.lider-video--exemplo::before { content: ''; position: absolute; inset: 0; background: url(/img/bg-soft.jpg) center / cover; opacity: 0.25; }
+.lider-video .lider-exemplo-foto { position: absolute; left: 50%; top: 22%; width: 120px; height: 120px; transform: translateX(-50%); border-radius: 50%; border: 3px solid rgba(255, 255, 255, 0.85); object-fit: cover; }
+.lider-exemplo-legenda { position: absolute; left: 0; right: 0; bottom: 32px; color: #fff; text-align: center; font-size: 14px; line-height: 1.5; opacity: 0.85; }
+.lider-exemplo-legenda b { display: block; font-family: var(--font-head); font-size: 18px; font-weight: 700; opacity: 1; }
+@media (max-width: 767px) {
+  /* No celular: vídeo e depois a fala de cada líder */
+  .lideres-grid > .lider-video--exemplo { order: 3; }
+  .lideres-grid > .depoimento:last-of-type { order: 4; }
+}
+
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
   .js-reveal [data-reveal], .js-reveal [data-reveal].is-in { opacity: 1; animation: none; }
