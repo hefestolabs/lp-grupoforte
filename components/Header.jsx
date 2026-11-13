@@ -16,9 +16,9 @@ export default function Header({ nav, whatsapp }) {
             {nav.map((n) => (
               <li key={n.label}>
                 {n.external ? (
-                  <a href={n.href}>{n.label}</a>
+                  <a href={n.href} data-page={n.page}>{n.label}</a>
                 ) : (
-                  <Link href={n.href} onClick={() => setOpen(false)}>{n.label}</Link>
+                  <Link href={n.href} data-page={n.page} onClick={() => setOpen(false)}>{n.label}</Link>
                 )}
               </li>
             ))}

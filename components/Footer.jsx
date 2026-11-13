@@ -31,10 +31,10 @@ export default function Footer({ c }) {
               <div className="footer-info">
                 <h4 className="footer-title">INFORMAÇÕES</h4>
                 <ul>
-                  <li><Link href="/">Home</Link></li>
-                  <li><Link href="/sobre-nos/">Sobre nós</Link></li>
-                  <li><Link href="/produtos/">Produtos</Link></li>
-                  <li><Link href="/trabalhe-conosco/">Trabalhe Conosco</Link></li>
+                  <li><Link href="/" data-page="home">Home</Link></li>
+                  <li><Link href="/sobre-nos/" data-page="sobre">Sobre nós</Link></li>
+                  <li><Link href="/produtos/" data-page="produtos">Produtos</Link></li>
+                  <li><Link href="/trabalhe-conosco/" data-page="trabalhe">Trabalhe Conosco</Link></li>
                 </ul>
               </div>
             </div>

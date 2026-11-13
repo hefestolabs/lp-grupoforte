@@ -8,10 +8,10 @@ const DEVICES = [['desktop', 'Computador', '100%'], ['tablet', 'Tablet', '820px'
 // Editor visual: prévia do site real à direita, campos da parte escolhida à esquerda.
 export default function Editor({ schema, content, setContent, saved, setSaved, notify, user, goTab, logout }) {
   const pages = useMemo(() => [
-    { id: 'home', label: 'Página inicial', path: '/', section: 'home' },
-    { id: 'sobre', label: 'Sobre nós', path: '/sobre-nos/', section: 'sobre' },
-    { id: 'produtos', label: 'Produtos', path: '/produtos/', section: 'paginas', only: ['produtos'], extra: [['home', 'marcas']] },
-    { id: 'trabalhe', label: 'Trabalhe conosco', path: '/trabalhe-conosco/', section: 'paginas', only: ['trabalhe'] },
+    { id: 'home', label: 'Página inicial', short: 'Home', path: '/', section: 'home' },
+    { id: 'sobre', label: 'Sobre nós', short: 'Sobre nós', path: '/sobre-nos/', section: 'sobre' },
+    { id: 'produtos', label: 'Produtos', short: 'Produtos', path: '/produtos/', section: 'paginas', only: ['produtos'], extra: [['home', 'marcas']] },
+    { id: 'trabalhe', label: 'Trabalhe conosco', short: 'Trabalhe conosco', path: '/trabalhe-conosco/', section: 'paginas', only: ['trabalhe'] },
   ], []);
   const [pageId, setPageId] = useState('home');
   const [sel, setSel] = useState(null); // "seção:grupo"
@@ -57,6 +57,7 @@ export default function Editor({ schema, content, setContent, saved, setSaved, n
     const onMessage = (e) => {
       if (e.origin !== window.location.origin || e.data?.source !== 'gf-previa') return;
       if (e.data.type === 'select') { setSel(e.data.id); setShowPreview(false); }
+      if (e.data.type === 'page' && pages.some((x) => x.id === e.data.id)) setPageId(e.data.id);
       if (e.data.type === 'scroll') scrollY.current = e.data.y;
       if (e.data.type === 'ready') { setState('pronto'); post({ type: 'scroll', y: scrollY.current }); if (sel) post({ type: 'focus', id: sel, scroll: false }); }
     };
@@ -90,6 +91,9 @@ export default function Editor({ schema, content, setContent, saved, setSaved, n
     <div className={`ed ${showPreview ? 'ed--preview' : ''}`}>
       <header className="ed-bar">
         <img className="ed-logo" src="/img/logo-branco.png" alt="Grupo Forte" width="120" height="34" />
+        <nav className="ed-tabs" aria-label="Página que está sendo editada">
+          {pages.map((p) => <button type="button" key={p.id} className={pageId === p.id ? 'is-active' : ''} aria-current={pageId === p.id ? 'page' : undefined} onClick={() => setPageId(p.id)}>{p.short}</button>)}
+        </nav>
         <label className="ed-page"><span className="sr-only">Página</span>
           <select value={pageId} onChange={(e) => setPageId(e.target.value)}>{pages.map((p) => <option key={p.id} value={p.id}>{p.label}</option>)}</select>
         </label>
@@ -126,7 +130,7 @@ export default function Editor({ schema, content, setContent, saved, setSaved, n
         ) : (
           <>
             <h2>{page.label}</h2>
-            <p className="ed-hint">Clique em uma parte do site ao lado para editar, ou escolha aqui:</p>
+            <p className="ed-hint">Clique em uma parte do site ao lado para editar, ou escolha aqui. Para mudar de página, use as abas no topo ou o menu do próprio site.</p>
             <div className="ed-list">
               {groups.map((g) => <button type="button" key={g.key} onClick={() => choose(g.key)}><span>{g.group.titulo}</span><small>{g.section === 'contatos' ? 'Rodapé e contatos' : g.group.campos.length === 1 ? '1 campo' : `${g.group.campos.length} campos`}</small></button>)}
             </div>

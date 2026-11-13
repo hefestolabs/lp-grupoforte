@@ -183,3 +183,13 @@
   .ed-toggle--back { margin: 0 0 8px; }
   .ed-aviso { left: 16px; }
 }
+
+/* Abas das páginas no editor */
+.ed-tabs { display: flex; gap: 2px; align-self: stretch; align-items: flex-end; }
+.ed-tabs button { min-height: 44px; padding: 0 16px; border: 0; border-radius: 8px 8px 0 0; background: none; color: rgba(255, 255, 255, 0.82); font: inherit; font-weight: 600; cursor: pointer; white-space: nowrap; }
+.ed-tabs button:hover { background: rgba(255, 255, 255, 0.12); color: #fff; }
+.ed-tabs button.is-active { background: #dfe3e8; color: var(--p-navy); }
+.ed-page { display: none; }
+.gf-editing a[data-page] { cursor: pointer; }
+@media (max-width: 1250px) { .ed-logo { display: none; } .ed-tabs button { padding: 0 11px; font-size: 14px; } }
+@media (max-width: 1000px) { .ed-tabs { display: none; } .ed-page { display: block; } }

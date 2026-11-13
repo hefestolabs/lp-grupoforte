@@ -9,6 +9,9 @@ export default function EditBridge() {
     const tell = (msg) => window.parent?.postMessage({ source: 'gf-previa', ...msg }, window.location.origin);
     const onClick = (e) => {
       e.preventDefault(); e.stopPropagation();
+      // Clicar em um item do menu do site troca a página que está sendo editada.
+      const menu = e.target.closest('a[data-page]');
+      if (menu) return tell({ type: 'page', id: menu.getAttribute('data-page') });
       const el = e.target.closest('[data-edit]');
       if (el) { mark(el.getAttribute('data-edit')); tell({ type: 'select', id: el.getAttribute('data-edit') }); }
     };
