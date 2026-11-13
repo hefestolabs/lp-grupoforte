@@ -6,6 +6,7 @@ import Counter from '@/components/Counter';
 import Accordion from '@/components/Accordion';
 import Carousel from '@/components/Carousel';
 import PostGrid from '@/components/PostGrid';
+import HeroVideo from '@/components/HeroVideo';
 import { getPosts } from '@/lib/data';
 import { SITE } from '@/lib/site';
 
@@ -41,6 +42,8 @@ export default async function Home() {
     <>
       <section className="hero-wrap">
         <div className="hero">
+          <HeroVideo id="20N43pv_Dzk" start={1} />
+          <div className="hero-overlay" />
           <img src="/img/hero-logo.png" alt="Grupo Forte — Tradição, Inovação e Qualidade no Setor da Construção" width="496" height="120" data-reveal />
         </div>
       </section>
