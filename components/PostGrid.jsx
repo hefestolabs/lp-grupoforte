@@ -6,11 +6,11 @@ export default function PostGrid({ posts }) {
   if (!posts.length) return <p className="post-empty">Nenhuma notícia publicada ainda.</p>;
   return (
     <div className="post-grid">
-      {posts.map((p) => {
+      {posts.map((p, i) => {
         const d = formatDate(p.date);
         const cat = p.categories[0];
         return (
-          <article className="post-card" key={p.slug}>
+          <article className="post-card" key={p.slug} data-reveal style={{ "--d": `${(i % 3) * 200}ms` }}>
             <Link href={`/${p.slug}/`} className="post-card-img" aria-label={p.title}>
               {p.image ? <img src={p.image.src} alt={p.image.alt} loading="lazy" /> : null}
               <span className="post-card-badge"><b>{d.dia}</b>{d.mesCurto}</span>

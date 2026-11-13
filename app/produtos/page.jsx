@@ -15,7 +15,7 @@ export default function Produtos() {
       <section className="produtos">
         <div className="container">
           <div className="produtos-head">
-            <div className="marcas-head">
+            <div className="marcas-head" data-reveal="full">
               <Eyebrow>Nossas marcas</Eyebrow>
               <h1 className="h-display">Marcas fortes que entregam valor.</h1>
             </div>
@@ -25,7 +25,7 @@ export default function Produtos() {
         </div>
       </section>
       <section className="catalogo">
-        <div className="catalogo-box">
+        <div className="catalogo-box" data-reveal>
           <img src="/img/pdf.png" alt="" width="150" height="150" loading="lazy" />
           <div>
             <p>Conheça nossa linha completa de soluções e especificações de produto.</p>

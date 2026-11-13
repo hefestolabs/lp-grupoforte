@@ -15,8 +15,8 @@ export default function TrabalheConosco() {
       <PageHero title="Trabalhe conosco" image="/img/trabalhe-capa.jpg" />
       <section className="trabalhe">
         <div className="container">
-          <iframe className="trabalhe-mapa" title="Mapa: unidade industrial do Grupo Forte em Cacoal (RO)" src={`${MAPA}&output=embed`} loading="lazy" referrerPolicy="no-referrer-when-downgrade" />
-          <article className="unidade-card">
+          <iframe data-reveal className="trabalhe-mapa" title="Mapa: unidade industrial do Grupo Forte em Cacoal (RO)" src={`${MAPA}&output=embed`} loading="lazy" referrerPolicy="no-referrer-when-downgrade" />
+          <article className="unidade-card" data-reveal style={{ "--d": "200ms" }}>
             <img src="/img/unidade-cacoal.jpg" alt="Fachada da unidade industrial em Cacoal" width="176" height="176" loading="lazy" />
             <div className="unidade-card-body">
               <h4>Unidade Industrial | Cacoal (RO)</h4>

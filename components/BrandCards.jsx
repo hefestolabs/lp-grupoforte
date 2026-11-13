@@ -4,8 +4,8 @@ import { MARCAS } from '@/lib/site';
 export default function BrandCards({ variant = 'home' }) {
   return (
     <div className={`brand-grid brand-grid--${variant}`}>
-      {MARCAS.map((m) => (
-        <article className="brand-card" key={m.nome}>
+      {MARCAS.map((m, i) => (
+        <article className="brand-card" key={m.nome} data-reveal style={{ "--d": `${i * 200}ms` }}>
           <div className="brand-card-img" role="img" aria-label={m.nome} style={{ backgroundImage: `url(${m.img})` }} />
           <div className="brand-card-body">
             <p>{variant === 'produtos' && m.textoProdutos ? m.textoProdutos : m.texto}</p>

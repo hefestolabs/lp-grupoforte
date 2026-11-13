@@ -41,22 +41,22 @@ export default async function Home() {
     <>
       <section className="hero-wrap">
         <div className="hero">
-          <img src="/img/hero-logo.png" alt="Grupo Forte — Tradição, Inovação e Qualidade no Setor da Construção" width="496" height="120" />
+          <img src="/img/hero-logo.png" alt="Grupo Forte — Tradição, Inovação e Qualidade no Setor da Construção" width="496" height="120" data-reveal="full" />
         </div>
       </section>
 
       <section className="marcas">
         <div className="container marcas-inner">
-          <div className="marcas-head" id="PRODUTOSANCORA">
+          <div className="marcas-head" id="PRODUTOSANCORA" data-reveal="full">
             <Eyebrow>Nossas marcas</Eyebrow>
             <h1 className="h-display">Marcas fortes que entregam valor.</h1>
           </div>
           <BrandCards />
           <div className="unidades">
-            <h2>Estrutura sólida para atender diferentes mercados.</h2>
+            <h2 data-reveal>Estrutura sólida para atender diferentes mercados.</h2>
             <div className="unidades-grid">
-              {UNIDADES.map((u) => (
-                <div className="unidade" key={u.local}>
+              {UNIDADES.map((u, i) => (
+                <div className="unidade" key={u.local} data-reveal style={{ "--d": `${300 + i * 300}ms` }}>
                   <strong>{u.tipo}</strong>
                   <span className="unidade-local"><Icon name="e-fas-map-marker-alt" size={25} />{u.local}</span>
                   <ul><li>{u.texto}</li></ul>
@@ -69,7 +69,7 @@ export default async function Home() {
 
       <section className="counters-wrap">
         <div className="container">
-          <div className="counters">
+          <div className="counters" data-reveal>
             <Counter title="Anos" end={25} />
             <Counter title="Market Share RO" end={60} prefix="+" suffix="%" />
             <Counter title="Toneladas Produtos / Ano" end={2000} prefix="+" />
@@ -81,23 +81,25 @@ export default async function Home() {
       <section className="servicos">
         <div className="container servicos-inner">
           <div className="servicos-side">
-            <div className="card-navy insta-card">
+            <div className="card-navy insta-card" data-reveal>
               <h4>Acompanhe o Grupo Forte no Instagram e fique por dentro das novidades, lançamentos e bastidores.</h4>
               <a className="btn btn-orange btn-bordered" href={SITE.instagram}>
                 <Icon name="e-fab-instagram" size={15} />
                 <span>Siga no instagram</span>
               </a>
             </div>
-            <div className="insta-arte">
+            <div className="insta-arte" data-reveal style={{ "--d": "300ms" }}>
               <a href={SITE.instagramPost} aria-label="Ver publicação no Instagram"><Icon name="heart" size={25} /></a>
             </div>
           </div>
           <div className="servicos-main">
-            <Eyebrow>Outros serviços</Eyebrow>
-            <h2 className="h-section">Soluções completas para cada etapa da construção.</h2>
+            <div data-reveal>
+              <Eyebrow>Outros serviços</Eyebrow>
+              <h2 className="h-section">Soluções completas para cada etapa da construção.</h2>
+            </div>
             <div className="servicos-grid">
-              {SERVICOS.map((s) => (
-                <article className="servico" key={s.titulo}>
+              {SERVICOS.map((s, i) => (
+                <article className="servico" key={s.titulo} data-reveal style={{ "--d": `${i * 150}ms` }}>
                   <div className="servico-head">
                     <Icon name={s.icon} size={80} />
                     <h3>{s.titulo}</h3>
@@ -110,7 +112,7 @@ export default async function Home() {
                   )}
                 </article>
               ))}
-              <article className="card-navy servico-cta">
+              <article className="card-navy servico-cta" data-reveal style={{ "--d": "450ms" }}>
                 <h4>Da base ao acabamento, entregamos soluções que fortalecem obras, negócios e realizam sonhos.</h4>
                 <a className="btn btn-orange btn-bordered" href="#PRODUTOSANCORA"><span>Produtos</span><Icon name="arrow-up-right" size={15} /></a>
               </article>
@@ -122,13 +124,13 @@ export default async function Home() {
       <section className="info-wrap">
         <div className="info panel-navy">
           <div className="info-bg" />
-          <div className="info-head">
+          <div className="info-head" data-reveal="full">
             <Eyebrow className="eyebrow--light">Informações</Eyebrow>
             <h2>Do início ao acabamento, o Grupo Forte entrega soluções completas.</h2>
           </div>
           <div className="info-body">
-            <p>Construímos mais do que produtos: entregamos confiança, inovação e resultados. Com marcas consolidadas e processos integrados, o Grupo Forte fortalece cada projeto e impulsiona o futuro da construção civil.</p>
-            <div className="info-card">
+            <p data-reveal style={{ "--d": "300ms" }}>Construímos mais do que produtos: entregamos confiança, inovação e resultados. Com marcas consolidadas e processos integrados, o Grupo Forte fortalece cada projeto e impulsiona o futuro da construção civil.</p>
+            <div className="info-card" data-reveal style={{ "--d": "450ms" }}>
               <Accordion items={INFO} />
             </div>
           </div>
@@ -137,9 +139,11 @@ export default async function Home() {
 
       <section className="parceiros">
         <div className="container">
-          <Eyebrow className="eyebrow--center">Parceiros</Eyebrow>
-          <h2 className="h-light">Empresas que confiam no <b>GRUPOFORTE</b></h2>
-          <div className="parceiros-panel">
+          <div data-reveal>
+            <Eyebrow className="eyebrow--center">Parceiros</Eyebrow>
+            <h2 className="h-light">Empresas que confiam no <b>GRUPOFORTE</b></h2>
+          </div>
+          <div className="parceiros-panel" data-reveal style={{ "--d": "300ms" }}>
             <Carousel slides={PARCEIROS} />
           </div>
         </div>
@@ -148,11 +152,11 @@ export default async function Home() {
       <section className="noticias">
         <div className="container">
           <div className="noticias-head">
-            <div>
+            <div data-reveal>
               <Eyebrow className="eyebrow--plain">Notícias e insights</Eyebrow>
               <h2 className="h-light h-navy">Fique por dentro das novidades, lançamentos e tendências...</h2>
             </div>
-            <Link className="btn btn-cta btn-cta--hover" href="/noticias/"><span>Saiba mais</span><Icon name="arrow-up-right" size={16} /></Link>
+            <Link className="btn btn-cta btn-cta--hover" href="/noticias/" data-reveal><span>Saiba mais</span><Icon name="arrow-up-right" size={16} /></Link>
           </div>
           <PostGrid posts={posts} />
         </div>
