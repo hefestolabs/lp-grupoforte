@@ -13,7 +13,7 @@ export default async function Produtos() {
   const { home, paginas: p } = await getContent();
   return (
     <>
-      <PageHero title="Produtos" image={p.produtosCapa} />
+      <PageHero title="Produtos" image={p.produtosCapa} edit="paginas:produtos" />
       <section className="produtos">
         <div className="container">
           <div className="produtos-head">
@@ -26,7 +26,7 @@ export default async function Produtos() {
           <BrandCards marcas={home.marcas} variant="produtos" />
         </div>
       </section>
-      <section className="catalogo">
+      <section className="catalogo" data-edit="paginas:produtos">
         <div className="catalogo-box" data-reveal>
           <img src="/img/pdf.png" alt="" width="150" height="150" loading="lazy" />
           <div>

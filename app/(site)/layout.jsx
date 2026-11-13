@@ -1,12 +1,14 @@
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import Reveal from '@/components/Reveal';
-import { getContent } from '@/lib/content';
+import EditBridge from '@/components/EditBridge';
+import { getContent, previewUserId } from '@/lib/content';
 
 export const dynamic = 'force-dynamic'; // o conteúdo vem do painel
 
 export default async function SiteLayout({ children }) {
   const { contatos } = await getContent();
+  const previa = Boolean(await previewUserId());
   const nav = [
     { label: 'Home', href: '/' },
     { label: 'Sobre nós', href: '/sobre-nos/' },
@@ -19,7 +21,7 @@ export default async function SiteLayout({ children }) {
       <Header nav={nav} whatsapp={contatos.whatsapp} />
       <main id="conteudo">{children}</main>
       <Footer c={contatos} />
-      <Reveal />
+      {previa ? <EditBridge /> : <Reveal />}
     </>
   );
 }

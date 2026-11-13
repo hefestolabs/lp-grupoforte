@@ -10,7 +10,7 @@ export default function Footer({ c }) {
             <img className="footer-logo" src="/img/logo-branco.png" alt="Grupo Forte" width="300" height="86" />
             <hr />
             <div className="footer-cols">
-              <div className="footer-brand">
+              <div className="footer-brand" data-edit="contatos:redes">
                 <h4>GRUPO FORTE</h4>
                 <p>{c.slogan}</p>
                 <ul className="socials">
@@ -20,7 +20,7 @@ export default function Footer({ c }) {
                   {c.youtube ? <li><a href={c.youtube} target="_blank" rel="noopener"><Icon name="e-fab-youtube" size={25} title="Youtube" /></a></li> : null}
                 </ul>
               </div>
-              <div className="footer-contact">
+              <div className="footer-contact" data-edit="contatos:contato">
                 <h4 className="footer-title">CONTATO</h4>
                 <ul>
                   <li><a href={`mailto:${c.email}`}>E-mail: {c.email}</a></li>
@@ -41,7 +41,7 @@ export default function Footer({ c }) {
           </div>
         </div>
       </footer>
-      <div className="copyright">
+      <div className="copyright" data-edit="contatos:rodape">
         <p>{c.copyright}</p>
       </div>
     </>

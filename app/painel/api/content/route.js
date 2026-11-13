@@ -1,5 +1,5 @@
 import { body, fail, guard, json } from '@/lib/api';
-import { DEFAULTS, getContent, saveSection } from '@/lib/content';
+import { DEFAULTS, getPublished as getContent, saveSection } from '@/lib/content';
 
 export async function GET() {
   const g = await guardRead(); if (g) return g;

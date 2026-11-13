@@ -13,12 +13,12 @@ export default async function SobreNos() {
   const { sobre: s } = await getContent();
   return (
     <>
-      <PageHero title="Sobre nós" image={s.capa} overlay={0.7} />
+      <PageHero title="Sobre nós" image={s.capa} overlay={0.7} edit="sobre:topo" />
 
       <section className="sobre">
         <div className="container">
-          <a className="sobre-banner" style={{ backgroundImage: `url(${s.banner})` }} href={s.bannerLink || undefined} aria-label="Assistir ao vídeo institucional" data-reveal />
-          <div className="sobre-cols">
+          <a className="sobre-banner" data-edit="sobre:topo" style={{ backgroundImage: `url(${s.banner})` }} href={s.bannerLink || undefined} aria-label="Assistir ao vídeo institucional" data-reveal />
+          <div className="sobre-cols" data-edit="sobre:texto">
             <div className="sobre-texto">
               <Eyebrow className="eyebrow--plain eyebrow--small">Sobre nós</Eyebrow>
               <h2 data-reveal>{s.titulo}</h2>
@@ -38,7 +38,7 @@ export default async function SobreNos() {
         </div>
       </section>
 
-      <section className="mvv">
+      <section className="mvv" data-edit="sobre:valores">
         <div className="mvv-grid">
           {s.valores.map((m, i) => (
             <article className="mvv-card" key={i} data-reveal style={{ '--d': `${i * 120}ms` }}>
@@ -51,7 +51,7 @@ export default async function SobreNos() {
       </section>
 
       {s.logos.length ? (
-        <section className="sobre-logos">
+        <section className="sobre-logos" data-edit="sobre:logos">
           <div className="container">
             <div className="sobre-logos-row">
               {s.logos.filter((l) => l.img).map((l, i) => <img key={i} data-reveal style={{ '--d': `${i * 120}ms` }} src={l.img} alt={l.nome} width="186" height="67" loading="lazy" />)}
@@ -60,7 +60,7 @@ export default async function SobreNos() {
         </section>
       ) : null}
 
-      <section className="lideres">
+      <section className="lideres" data-edit="sobre:lideres">
         <div className="container">
           <Eyebrow className="eyebrow--center eyebrow--plain eyebrow--small">Líderes</Eyebrow>
           <div className="lideres-lista">

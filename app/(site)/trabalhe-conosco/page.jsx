@@ -14,8 +14,8 @@ export default async function TrabalheConosco() {
   const tel = contatos.telefone.replace(/\D/g, '');
   return (
     <>
-      <PageHero title="Trabalhe conosco" image={p.trabalheCapa} />
-      <section className="trabalhe">
+      <PageHero title="Trabalhe conosco" image={p.trabalheCapa} edit="paginas:trabalhe" />
+      <section className="trabalhe" data-edit="paginas:trabalhe">
         <div className="container">
           <iframe className="trabalhe-mapa" title="Mapa da unidade industrial do Grupo Forte" src={`${mapa}&output=embed`} loading="lazy" referrerPolicy="no-referrer-when-downgrade" />
           <article className="unidade-card" data-reveal>

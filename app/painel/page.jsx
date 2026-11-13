@@ -1,7 +1,7 @@
 import { redirect } from 'next/navigation';
 import PainelApp from '@/components/painel/PainelApp';
 import { getSession } from '@/lib/auth';
-import { getContent } from '@/lib/content';
+import { getPublished as getContent } from '@/lib/content';
 import { getAllPostsAdmin } from '@/lib/data';
 import { SCHEMA } from '@/lib/schema';
 import { storeMode, usersList } from '@/lib/store';

@@ -2,11 +2,12 @@
 import { useEffect, useMemo, useState } from 'react';
 import { api } from './api';
 import { Field } from './Fields';
+import Editor from './Editor';
 
 const hoje = () => new Date().toISOString().slice(0, 10);
 
 export default function PainelApp({ storeMode, user, schema, initialContent, initialPosts, initialUsers }) {
-  const [tab, setTab] = useState(user.mustChange ? 'senha' : 'inicio');
+  const [tab, setTab] = useState(user.mustChange ? 'senha' : 'editor');
   const [content, setContent] = useState(initialContent);
   const [saved, setSaved] = useState(initialContent);
   const [posts, setPosts] = useState(initialPosts);
@@ -43,7 +44,17 @@ export default function PainelApp({ storeMode, user, schema, initialContent, ini
   }
   async function logout() { await api('logout', { method: 'POST' }).catch(() => {}); window.location.href = '/painel/login/'; }
 
-  const nav = [['inicio', 'Visão geral'], ...schema.map((s) => [s.id, s.titulo]), ['noticias', 'Notícias'], ...(user.admin ? [['acessos', 'Acessos'], ['email', 'E-mail (Resend)']] : []), ['senha', 'Minha conta']];
+  const nav = [['editor', 'Editar o site'], ['noticias', 'Notícias'], ...(user.admin ? [['acessos', 'Acessos'], ['email', 'E-mail (Resend)']] : []), ['senha', 'Minha conta']];
+
+  if (tab === 'editor') {
+    return (
+      <>
+        <Editor schema={schema} content={content} setContent={setContent} saved={saved} setSaved={setSaved} notify={notify} user={user} goTab={(t) => { setTab(t); window.scrollTo(0, 0); }} logout={logout} />
+        {storeMode !== 'mysql' ? <p className="p-error p-aviso ed-aviso" role="alert">Atenção: o banco de dados não está conectado. As alterações se perdem na próxima publicação do site.</p> : null}
+        {toast ? <div className={`p-toast p-toast--${toast.kind}`} role="status">{toast.text}</div> : null}
+      </>
+    );
+  }
 
   return (
     <div className="p-app">

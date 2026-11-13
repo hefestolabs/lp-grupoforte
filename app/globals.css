@@ -745,3 +745,10 @@ button { font: inherit; cursor: pointer; }
   .hero-video iframe { display: none; }
   * { transition: none !important; }
 }
+
+/* ---------- Prévia dentro do editor do painel ---------- */
+.gf-editing [data-edit] { cursor: pointer; outline: 2px dashed transparent; outline-offset: 4px; transition: outline-color 0.15s; }
+.gf-editing [data-edit]:hover { outline-color: rgba(238, 115, 2, 0.75); }
+.gf-editing [data-edit].gf-selected { outline: 3px solid #ee7302; }
+.gf-editing .header { position: static; }
+.gf-editing iframe { pointer-events: none; }

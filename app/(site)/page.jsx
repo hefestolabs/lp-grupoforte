@@ -21,7 +21,7 @@ export default async function Home() {
   const videoId = youtubeId(h.heroVideo);
   return (
     <>
-      <section className="hero-wrap">
+      <section className="hero-wrap" data-edit="home:hero">
         <div className="hero">
           {videoId ? <HeroVideo id={videoId} start={h.heroVideoInicio} /> : null}
           <div className="hero-overlay" />
@@ -31,12 +31,12 @@ export default async function Home() {
 
       <section className="marcas">
         <div className="container marcas-inner">
-          <div className="marcas-head" id="PRODUTOSANCORA" data-reveal>
+          <div className="marcas-head" id="PRODUTOSANCORA" data-reveal data-edit="home:marcas">
             <Eyebrow>Nossas marcas</Eyebrow>
             <h1 className="h-display">{h.marcasTitulo}</h1>
           </div>
           <BrandCards marcas={h.marcas} />
-          <div className="unidades" data-reveal>
+          <div className="unidades" data-reveal data-edit="home:unidades">
             <h2>{h.unidadesTitulo}</h2>
             <div className="unidades-grid">
               {h.unidades.map((u, i) => (
@@ -51,7 +51,7 @@ export default async function Home() {
         </div>
       </section>
 
-      <section className="counters-wrap">
+      <section className="counters-wrap" data-edit="home:numeros">
         <div className="container">
           <div className="counters">
             {h.contadores.map((c, i) => <Counter key={i} title={c.titulo} end={c.valor} prefix={c.prefixo} suffix={c.sufixo} />)}
@@ -61,7 +61,7 @@ export default async function Home() {
 
       <section className="servicos">
         <div className="container servicos-inner">
-          <div className="servicos-side" data-reveal>
+          <div className="servicos-side" data-reveal data-edit="home:instagram">
             <div className="card-navy insta-card">
               <h4>{h.instagramTexto}</h4>
               <a className="btn btn-orange btn-bordered" href={contatos.instagram}>
@@ -73,7 +73,7 @@ export default async function Home() {
               {h.instagramPost ? <a href={h.instagramPost} aria-label="Ver publicação no Instagram"><Icon name="heart" size={25} /></a> : null}
             </div>
           </div>
-          <div className="servicos-main">
+          <div className="servicos-main" data-edit="home:servicos">
             <div data-reveal>
               <Eyebrow>Outros serviços</Eyebrow>
               <h2 className="h-section">{h.servicosTitulo}</h2>
@@ -98,7 +98,7 @@ export default async function Home() {
         </div>
       </section>
 
-      <section className="info-wrap">
+      <section className="info-wrap" data-edit="home:info">
         <div className="info panel-navy">
           <div className="info-bg" />
           <div className="info-head" data-reveal>
@@ -115,7 +115,7 @@ export default async function Home() {
       </section>
 
       {h.parceiros.length ? (
-        <section className="parceiros">
+        <section className="parceiros" data-edit="home:parceiros">
           <div className="container">
             <div data-reveal>
               <Eyebrow className="eyebrow--center">Parceiros</Eyebrow>
@@ -128,7 +128,7 @@ export default async function Home() {
         </section>
       ) : null}
 
-      <section className="noticias">
+      <section className="noticias" data-edit="home:noticias">
         <div className="container">
           <div className="noticias-head">
             <div data-reveal>
