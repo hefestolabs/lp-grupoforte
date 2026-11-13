@@ -268,14 +268,13 @@ button { font: inherit; cursor: pointer; }
 .round-icons a { display: flex; align-items: center; justify-content: center; width: 42px; height: 42px; border-radius: 50%; background: var(--navy); color: #fff; transition: background-color 0.3s; }
 .round-icons a:hover { background: var(--accent); }
 
-/* ---------- Efeitos de entrada (fadeInUp do Elementor: 1,25s) ---------- */
+/* ---------- Efeitos de entrada: fadeInUp suave, um por bloco, cascata curta só em grades de cartões ---------- */
 @keyframes fadeInUp {
-  from { opacity: 0; transform: translate3d(0, var(--reveal-y, 60px), 0); }
+  from { opacity: 0; transform: translate3d(0, 32px, 0); }
   to { opacity: 1; transform: none; }
 }
 .js-reveal [data-reveal] { opacity: 0; }
-.js-reveal [data-reveal='full'] { --reveal-y: 100%; }
-.js-reveal [data-reveal].is-in { opacity: 1; animation: fadeInUp 1.25s both; animation-delay: var(--d, 0ms); }
+.js-reveal [data-reveal].is-in { opacity: 1; animation: fadeInUp 0.8s cubic-bezier(0.22, 0.61, 0.36, 1) both; animation-delay: var(--d, 0ms); }
 
 /* ================= Tablet ================= */
 @media (max-width: 1320px) {

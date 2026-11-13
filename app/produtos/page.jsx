@@ -15,7 +15,7 @@ export default function Produtos() {
       <section className="produtos">
         <div className="container">
           <div className="produtos-head">
-            <div className="marcas-head" data-reveal="full">
+            <div className="marcas-head" data-reveal>
               <Eyebrow>Nossas marcas</Eyebrow>
               <h1 className="h-display">Marcas fortes que entregam valor.</h1>
             </div>
