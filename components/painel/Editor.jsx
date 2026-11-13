@@ -94,12 +94,13 @@ export default function Editor({ schema, content, setContent, saved, setSaved, n
         <nav className="ed-tabs" aria-label="Página que está sendo editada">
           {pages.map((p) => <button type="button" key={p.id} className={pageId === p.id ? 'is-active' : ''} aria-current={pageId === p.id ? 'page' : undefined} onClick={() => setPageId(p.id)}>{p.short}</button>)}
         </nav>
+        <span className="ed-sep" aria-hidden="true" />
+        <button type="button" className="ed-tablike" onClick={() => leave('noticias')}>Notícias</button>
+        <button type="button" className="ed-btn ed-btn--new" onClick={() => leave('noticias:nova')}>+ Nova notícia</button>
         <label className="ed-page"><span className="sr-only">Página</span>
           <select value={pageId} onChange={(e) => setPageId(e.target.value)}>{pages.map((p) => <option key={p.id} value={p.id}>{p.label}</option>)}</select>
         </label>
-        <div className="ed-devices" role="group" aria-label="Tamanho da prévia">
-          {DEVICES.map(([id, label]) => <button type="button" key={id} className={device === id ? 'is-active' : ''} aria-pressed={device === id} onClick={() => setDevice(id)}>{label}</button>)}
-        </div>
+        <span className="ed-grow" />
         <span className={`ed-state ${dirty ? 'is-dirty' : ''}`}>{state === 'atualizando' ? 'Atualizando a prévia…' : dirty ? 'Alterações não publicadas' : 'Tudo publicado'}</span>
         {dirty ? <button type="button" className="ed-btn" onClick={discard}>Descartar</button> : null}
         <button type="button" className="ed-btn ed-btn--primary" disabled={!dirty || busy} onClick={publish}>{busy ? 'Publicando…' : 'Publicar'}</button>
@@ -126,6 +127,13 @@ export default function Editor({ schema, content, setContent, saved, setSaved, n
             <div className="ed-fields">
               {current.group.campos.map((c) => <Field key={c.key} field={c} value={content[current.section][c.key]} onChange={(v) => change(current.section, c.key, v)} />)}
             </div>
+            {current.key === 'home:noticias' ? (
+              <div className="ed-news">
+                <p className="ed-hint">As 3 notícias mais recentes aparecem aqui na página inicial.</p>
+                <button type="button" className="p-btn p-btn--primary" onClick={() => leave('noticias:nova')}>+ Nova notícia</button>
+                <button type="button" className="p-btn" onClick={() => leave('noticias')}>Ver e editar as notícias</button>
+              </div>
+            ) : null}
           </>
         ) : (
           <>
@@ -141,6 +149,10 @@ export default function Editor({ schema, content, setContent, saved, setSaved, n
 
       <main className="ed-stage">
         <button type="button" className="ed-btn ed-toggle ed-toggle--back" onClick={() => setShowPreview(false)}>← Voltar aos campos</button>
+        <div className="ed-devices" role="group" aria-label="Tamanho da prévia">
+          {DEVICES.map(([id, label]) => <button type="button" key={id} className={device === id ? 'is-active' : ''} aria-pressed={device === id} onClick={() => setDevice(id)}>{label}</button>)}
+        </div>
+
         <div ref={box} className={`ed-frame ed-frame--${device}`} style={{ width: DEVICES.find((d) => d[0] === device)[2] }}>
           <iframe ref={frame} title="Prévia do site" style={scale < 1 ? { width: 1440, height: `${100 / scale}%`, transform: `scale(${scale})`, transformOrigin: '0 0' } : undefined} />
         </div>

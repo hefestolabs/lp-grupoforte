@@ -15,6 +15,7 @@ export default function PainelApp({ storeMode, user, schema, initialContent, ini
   const [toast, setToast] = useState(null);
   const [busy, setBusy] = useState(false);
   const [menu, setMenu] = useState(false);
+  const [startNew, setStartNew] = useState(0); // abre Notícias já no formulário de nova notícia
   const locked = user.mustChange;
 
   const section = schema.find((s) => s.id === tab);
@@ -49,7 +50,7 @@ export default function PainelApp({ storeMode, user, schema, initialContent, ini
   if (tab === 'editor') {
     return (
       <>
-        <Editor schema={schema} content={content} setContent={setContent} saved={saved} setSaved={setSaved} notify={notify} user={user} goTab={(t) => { setTab(t); window.scrollTo(0, 0); }} logout={logout} />
+        <Editor schema={schema} content={content} setContent={setContent} saved={saved} setSaved={setSaved} notify={notify} user={user} goTab={(t) => { const [name, mode] = t.split(':'); setStartNew(mode === 'nova' ? Date.now() : 0); setTab(name); window.scrollTo(0, 0); }} logout={logout} />
         {storeMode !== 'mysql' ? <p className="p-error p-aviso ed-aviso" role="alert">Atenção: o banco de dados não está conectado. As alterações se perdem na próxima publicação do site.</p> : null}
         {toast ? <div className={`p-toast p-toast--${toast.kind}`} role="status">{toast.text}</div> : null}
       </>
@@ -96,7 +97,7 @@ export default function PainelApp({ storeMode, user, schema, initialContent, ini
           </>
         ) : null}
 
-        {tab === 'noticias' ? <Noticias posts={posts} setPosts={setPosts} notify={notify} /> : null}
+        {tab === 'noticias' ? <Noticias posts={posts} setPosts={setPosts} notify={notify} startNew={startNew} /> : null}
         {user.admin && tab === 'acessos' ? <Acessos users={users} setUsers={setUsers} me={user} notify={notify} go={go} /> : null}
         {user.admin && tab === 'email' ? <Email me={user} notify={notify} go={go} /> : null}
         {tab === 'senha' ? <Conta me={user} locked={locked} notify={notify} /> : null}
@@ -121,13 +122,14 @@ function Inicio({ go, posts, schema, user }) {
   );
 }
 
-function Noticias({ posts, setPosts, notify }) {
+function Noticias({ posts, setPosts, notify, startNew }) {
   const [edit, setEdit] = useState(null);
   const [busy, setBusy] = useState(false);
   const categorias = useMemo(() => [...new Set(posts.map((p) => p.categories[0]?.name).filter(Boolean))], [posts]);
   const novo = () => setEdit({ title: '', category: '', date: hoje(), image: '', imageAlt: '', excerpt: '', content: '', status: 'publicado', slug: '' });
   const abrir = (p) => setEdit({ id: p.id, title: p.title, category: p.categories[0]?.name || '', date: p.date.slice(0, 10), time: p.date.slice(11, 19), image: p.image?.src || '', imageAlt: p.image?.alt || '', excerpt: p.excerpt, content: p.content, status: p.status, slug: p.slug });
   const set = (k) => (v) => setEdit((e) => ({ ...e, [k]: v }));
+  useEffect(() => { if (startNew) novo(); }, [startNew]);
   async function reload() { setPosts(await api('posts')); }
   async function salvar() {
     setBusy(true);
@@ -150,27 +152,43 @@ function Noticias({ posts, setPosts, notify }) {
     return (
       <>
         <header className="p-head p-head--row"><div><h1>{edit.id ? 'Editar notícia' : 'Nova notícia'}</h1></div><button type="button" className="p-btn p-btn--ghost" onClick={() => setEdit(null)}>← Voltar</button></header>
-        <div className="p-card p-card--open"><div className="p-card-body">
-          <Field {...t('Título', 'title')} />
-          <div className="p-field"><label>Categoria<input list="p-cats" value={edit.category} onChange={(e) => set('category')(e.target.value)} placeholder="Ex.: Argaforte" /></label><datalist id="p-cats">{categorias.map((c) => <option key={c} value={c} />)}</datalist><p className="p-help">Escolha uma existente ou digite uma nova.</p></div>
-          <div className="p-field"><label>Data<input type="date" value={edit.date} onChange={(e) => set('date')(e.target.value)} /></label></div>
-          <Field {...t('Imagem de capa', 'image', { type: 'image', help: 'Horizontal (ex.: 1920×1080).' })} />
-          <Field {...t('Descrição da imagem', 'imageAlt', { help: 'Para leitores de tela e buscadores.' })} />
-          <Field {...t('Resumo', 'excerpt', { type: 'textarea', help: 'Opcional. Aparece nos buscadores.' })} />
-          <Field {...t('Texto', 'content', { type: 'textarea', help: 'Linha em branco separa parágrafos. Use **assim** para negrito.' })} />
-          <div className="p-field"><label>Situação<select value={edit.status} onChange={(e) => set('status')(e.target.value)}><option value="publicado">Publicada no site</option><option value="rascunho">Rascunho (não aparece)</option></select></label></div>
-          {edit.id ? <Field {...t('Endereço da página', 'slug', { help: 'Mudar o endereço quebra links já compartilhados.' })} /> : null}
-        </div></div>
+        <div className="p-post">
+          <div className="p-post-main">
+            <div className="p-card p-card--open"><div className="p-card-body">
+              <div className="p-field p-field--title"><label>Título<input value={edit.title} onChange={(e) => set('title')(e.target.value)} placeholder="Digite o título da notícia" /></label></div>
+              <Field {...t('Texto', 'content', { type: 'textarea', help: 'Linha em branco separa parágrafos. Use **assim** para negrito.' })} />
+              <Field {...t('Resumo', 'excerpt', { type: 'textarea', help: 'Opcional. Uma ou duas frases; aparece nos buscadores.' })} />
+            </div></div>
+          </div>
+          <aside className="p-post-side">
+            <div className="p-card p-card--open"><div className="p-card-body">
+              <h2>Publicação</h2>
+              <div className="p-field"><label>Situação<select value={edit.status} onChange={(e) => set('status')(e.target.value)}><option value="publicado">Publicada no site</option><option value="rascunho">Rascunho (não aparece)</option></select></label></div>
+              <div className="p-field"><label>Data<input type="date" value={edit.date} onChange={(e) => set('date')(e.target.value)} /></label></div>
+            </div></div>
+            <div className="p-card p-card--open"><div className="p-card-body">
+              <h2>Tema</h2>
+              <div className="p-field"><label>Tema (categoria)<input list="p-cats" value={edit.category} onChange={(e) => set('category')(e.target.value)} placeholder="Ex.: Argaforte" /></label><datalist id="p-cats">{categorias.map((c) => <option key={c} value={c} />)}</datalist><p className="p-help">Escolha um existente ou digite um novo.</p></div>
+              {categorias.length ? <div className="p-chips">{categorias.map((c) => <button type="button" key={c} className={edit.category === c ? 'is-active' : ''} onClick={() => set('category')(c)}>{c}</button>)}</div> : null}
+            </div></div>
+            <div className="p-card p-card--open"><div className="p-card-body">
+              <h2>Imagem de capa</h2>
+              <Field {...t('Imagem', 'image', { type: 'image', help: 'Horizontal (ex.: 1920×1080).' })} />
+              <Field {...t('Descrição da imagem', 'imageAlt', { help: 'Para leitores de tela e buscadores.' })} />
+            </div></div>
+            {edit.id ? <div className="p-card p-card--open"><div className="p-card-body"><Field {...t('Endereço da página', 'slug', { help: 'Mudar o endereço quebra links já compartilhados.' })} /></div></div> : null}
+          </aside>
+        </div>
         <div className="p-savebar is-dirty">
           {edit.id ? <button type="button" className="p-btn p-btn--danger" disabled={busy} onClick={excluir}>Excluir</button> : <span />}
-          <button type="button" className="p-btn p-btn--primary" disabled={busy} onClick={salvar}>{busy ? 'Salvando…' : 'Salvar notícia'}</button>
+          <button type="button" className="p-btn p-btn--primary" disabled={busy} onClick={salvar}>{busy ? 'Salvando…' : edit.status === 'publicado' ? (edit.id ? 'Atualizar notícia' : 'Publicar notícia') : 'Salvar rascunho'}</button>
         </div>
       </>
     );
   }
   return (
     <>
-      <header className="p-head p-head--row"><div><h1>Notícias</h1><p className="p-muted">As 3 mais recentes aparecem na página inicial.</p></div><button type="button" className="p-btn p-btn--primary" onClick={novo}>+ Nova notícia</button></header>
+      <header className="p-head p-head--row"><div><h1>Notícias</h1><p className="p-muted">Notícias e insights do site. As 3 mais recentes aparecem na página inicial.</p></div><button type="button" className="p-btn p-btn--primary" onClick={novo}>+ Nova notícia</button></header>
       <div className="p-card p-card--open">
         {posts.length ? posts.map((p) => (
           <button type="button" className="p-row" key={p.id} onClick={() => abrir(p)}>

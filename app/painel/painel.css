@@ -193,3 +193,45 @@
 .gf-editing a[data-page] { cursor: pointer; }
 @media (max-width: 1250px) { .ed-logo { display: none; } .ed-tabs button { padding: 0 11px; font-size: 14px; } }
 @media (max-width: 1000px) { .ed-tabs { display: none; } .ed-page { display: block; } }
+
+/* Notícias: atalhos no editor e formulário em duas colunas (como o editor de posts do WordPress) */
+.ed-sep { width: 1px; height: 24px; background: rgba(255, 255, 255, 0.25); }
+.ed-tablike { min-height: 38px; padding: 0 12px; border: 0; border-radius: 8px; background: none; color: rgba(255, 255, 255, 0.88); font: inherit; font-weight: 600; cursor: pointer; white-space: nowrap; }
+.ed-tablike:hover { background: rgba(255, 255, 255, 0.12); color: #fff; }
+.ed-btn--new { border-color: #ffc27a; color: #ffc27a; }
+.ed-news { display: flex; flex-direction: column; gap: 8px; margin-top: 20px; padding-top: 16px; border-top: 1px solid var(--p-line); }
+.p-main:has(.p-post) { max-width: 1120px; }
+.p-post { display: grid; grid-template-columns: minmax(0, 1fr) 320px; gap: 16px; align-items: start; }
+.p-post-side { display: flex; flex-direction: column; }
+.painel .p-field--title input { padding: 14px; font-family: var(--font-head); font-size: 22px; font-weight: 700; }
+.p-post-main .p-field--textarea:first-of-type textarea, .p-post-main .p-field--title + .p-field textarea { min-height: 320px; }
+.p-chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.p-chips button { min-height: 32px; padding: 0 12px; border: 1px solid var(--p-line); border-radius: 99px; background: #fff; font: inherit; font-size: 13px; cursor: pointer; }
+.p-chips button.is-active { border-color: var(--p-navy); background: var(--p-navy); color: #fff; }
+.p-post .p-image { flex-direction: column; align-items: flex-start; }
+.p-post .p-image-thumb { width: 100%; height: 150px; }
+@media (max-width: 1250px) { .ed-tablike { display: none; } }
+@media (max-width: 1000px) { .p-post { grid-template-columns: 1fr; } .ed-btn--new { order: 5; } .ed-sep { display: none; } }
+
+/* Barra do editor: nunca deixa "Publicar" sair da tela */
+.ed-bar { min-width: 0; gap: 10px; }
+.ed-bar > * { flex: none; }
+.ed-tabs button { padding: 0 13px; }
+.ed-devices button { padding: 0 10px; }
+@media (max-width: 1640px) { .ed-state { display: none; } .ed-state.is-dirty { display: inline; width: 10px; height: 10px; overflow: hidden; border-radius: 50%; background: #ffc27a; color: transparent; } }
+@media (max-width: 1400px) { .ed-tablike, .ed-sep { display: none; } }
+@media (max-width: 1250px) { .ed-devices button { padding: 0 8px; font-size: 12px; } .ed-btn { padding: 0 10px; } }
+
+/* Seletor de tamanho da prévia fica acima da prévia (libera espaço na barra) */
+.ed-grow { flex: 1 1 auto !important; }
+.ed-stage { flex-direction: column; align-items: center; gap: 10px; padding-top: 10px; }
+.ed-stage .ed-devices { margin: 0; flex: none; background: #c9d0d8; }
+.ed-stage .ed-devices button { color: #33414f; padding: 0 14px; font-size: 13px; }
+.ed-stage .ed-devices button.is-active { background: #fff; color: var(--p-navy); box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15); }
+.ed-frame { flex: 1; min-height: 0; height: auto; }
+@media (max-width: 1500px) { .ed-logo { display: none; } }
+@media (max-width: 860px) { .ed-stage .ed-devices { display: none; } }
+@media (max-width: 1100px) { .ed-tabs { display: none; } .ed-page { display: block; } .painel .ed-page select { min-width: 170px; } }
+/* O seletor de página só aparece quando as abas não cabem */
+.painel .ed-page { display: none; }
+@media (max-width: 1100px) { .painel .ed-page { display: block; } }
