@@ -1,13 +1,9 @@
 import './globals.css';
-import Header from '@/components/Header';
-import Footer from '@/components/Footer';
-import Reveal from '@/components/Reveal';
-import { SITE } from '@/lib/site';
 
 export const metadata = {
   metadataBase: new URL(process.env.SITE_URL || 'https://white-badger-810180.hostingersite.com'),
   title: { default: 'Grupo Forte — Tradição, Inovação e Qualidade no Setor da Construção', template: '%s — Grupo Forte' },
-  description: SITE.description,
+  description: 'Tradição, inovação e qualidade no setor da construção. Argaforte, Reboforte, Dacor e Realce Tintas.',
   icons: { icon: '/img/favicon.png' },
   openGraph: { siteName: 'Grupo Forte', locale: 'pt_BR', type: 'website' },
 };
@@ -25,13 +21,7 @@ export default function RootLayout({ children }) {
         <script dangerouslySetInnerHTML={{ __html: "document.documentElement.classList.add('js-reveal')" }} />
         <noscript><style>{'[data-reveal]{opacity:1!important;animation:none!important}'}</style></noscript>
       </head>
-      <body>
-        <a className="skip" href="#conteudo">Ir para o conteúdo</a>
-        <Header />
-        <main id="conteudo">{children}</main>
-        <Footer />
-        <Reveal />
-      </body>
+      <body>{children}</body>
     </html>
   );
 }

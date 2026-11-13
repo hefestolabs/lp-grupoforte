@@ -1,3 +1,4 @@
+// Banner do topo das páginas internas
 export default function PageHero({ title, image, overlay = 0.8, position = 'center' }) {
   return (
     <section className="page-hero-wrap">

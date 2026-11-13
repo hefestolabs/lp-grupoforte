@@ -724,6 +724,21 @@ button { font: inherit; cursor: pointer; }
   .lideres-grid > .depoimento:last-of-type { order: 4; }
 }
 
+/* Líderes: uma linha por pessoa, alternando o lado do vídeo */
+.lideres-lista { display: flex; flex-direction: column; gap: 20px; margin-top: 20px; }
+.lider { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; align-items: center; }
+.lider--inverso .lider-video { order: 2; }
+.sobre-paragrafos p { margin-top: 20px; color: var(--muted); }
+.sobre-paragrafos p + p { margin-top: 16px; }
+.insta-arte, .sobre-banner, .sobre-foto { background-size: cover; background-position: center; background-repeat: no-repeat; }
+.mvv-card p + p { margin-top: 8px; }
+@media (max-width: 767px) {
+  .lider { grid-template-columns: 1fr; gap: 28px; }
+  .lider--inverso .lider-video { order: 0; }
+  .lideres-lista { gap: 48px; }
+  .sobre-paragrafos p { text-align: center; }
+}
+
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
   .js-reveal [data-reveal], .js-reveal [data-reveal].is-in { opacity: 1; animation: none; }

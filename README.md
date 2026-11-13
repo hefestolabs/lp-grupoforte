@@ -3,13 +3,21 @@
 Site institucional do Grupo Forte: réplica em código (Next.js) do site original feito em Elementor, com as notícias vindas de um WordPress headless.
 
 - **Site:** https://white-badger-810180.hostingersite.com
-- **Painel de conteúdo (WordPress):** https://white-badger-810180.hostingersite.com/cms/wp-admin
+- **Painel:** https://white-badger-810180.hostingersite.com/painel/
+
+## Painel do cliente
+
+Em `/painel/` um funcionário do cliente atualiza o site sem mexer em código: notícias, imagens, textos, arte do Instagram, parceiros, contadores, líderes e contatos. Cada pessoa tem usuário e senha próprios.
+
+- Dados, imagens enviadas e usuários ficam em um banco MySQL da hospedagem (tabelas `gf_*`), lido pelas variáveis `DB_*` que a Hostinger injeta. Nada disso fica no repositório.
+- Sem as variáveis `DB_*` (desenvolvimento), o painel grava em `.data/`, que é ignorada pelo git.
+- Telas e campos do painel são descritos em `lib/schema.js`; o conteúdo padrão está em `lib/content.js`.
 
 ## Como funciona
 
 - O layout das páginas fica neste repositório (`app/`, `components/`, `app/globals.css`).
-- Notícias e categorias são lidas do WordPress em `/cms` (`lib/data.js`). Uma notícia publicada aparece no site em até 1 minuto, sem novo deploy.
-- Contatos, menu e marcas ficam em `lib/site.js`.
+- Todo o conteúdo editável vem do painel (`lib/content.js`, `lib/data.js`) e aparece no site assim que é salvo, sem novo deploy.
+- O WordPress em `/cms` continua instalado, mas o site não depende mais dele.
 
 ## Estrutura
 
