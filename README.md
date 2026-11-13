@@ -10,6 +10,7 @@ Site institucional do Grupo Forte: réplica em código (Next.js) do site origina
 Em `/painel/` um funcionário do cliente atualiza o site sem mexer em código: notícias, imagens, textos, arte do Instagram, parceiros, contadores, líderes e contatos. Cada pessoa tem usuário e senha próprios.
 
 - Dados, imagens enviadas e usuários ficam em um banco MySQL da hospedagem (tabelas `gf_*`), lido pelas variáveis `DB_*` que a Hostinger injeta. Nada disso fica no repositório.
+- O login é por e-mail e senha. Recuperação de senha e convites de novos acessos saem pelo Resend; a chave de API é digitada no próprio painel (E-mail (Resend)), fica cifrada no banco e nunca é exibida de novo.
 - Sem as variáveis `DB_*` (desenvolvimento), o painel grava em `.data/`, que é ignorada pelo git.
 - Telas e campos do painel são descritos em `lib/schema.js`; o conteúdo padrão está em `lib/content.js`.
 

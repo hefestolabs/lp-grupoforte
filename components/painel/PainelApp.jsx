@@ -43,7 +43,7 @@ export default function PainelApp({ storeMode, user, schema, initialContent, ini
   }
   async function logout() { await api('logout', { method: 'POST' }).catch(() => {}); window.location.href = '/painel/login/'; }
 
-  const nav = [['inicio', 'Visão geral'], ...schema.map((s) => [s.id, s.titulo]), ['noticias', 'Notícias'], ['acessos', 'Acessos'], ['senha', 'Minha senha']];
+  const nav = [['inicio', 'Visão geral'], ...schema.map((s) => [s.id, s.titulo]), ['noticias', 'Notícias'], ['acessos', 'Acessos'], ['email', 'E-mail (Resend)'], ['senha', 'Minha conta']];
 
   return (
     <div className="p-app">
@@ -86,8 +86,9 @@ export default function PainelApp({ storeMode, user, schema, initialContent, ini
         ) : null}
 
         {tab === 'noticias' ? <Noticias posts={posts} setPosts={setPosts} notify={notify} /> : null}
-        {tab === 'acessos' ? <Acessos users={users} setUsers={setUsers} me={user} notify={notify} /> : null}
-        {tab === 'senha' ? <Senha locked={locked} notify={notify} /> : null}
+        {tab === 'acessos' ? <Acessos users={users} setUsers={setUsers} me={user} notify={notify} go={go} /> : null}
+        {tab === 'email' ? <Email me={user} notify={notify} go={go} /> : null}
+        {tab === 'senha' ? <Conta me={user} locked={locked} notify={notify} /> : null}
       </main>
 
       {toast ? <div className={`p-toast p-toast--${toast.kind}`} role="status">{toast.text}</div> : null}
@@ -172,12 +173,17 @@ function Noticias({ posts, setPosts, notify }) {
   );
 }
 
-function Acessos({ users, setUsers, me, notify }) {
-  const [f, setF] = useState({ name: '', username: '', password: '' });
+function Acessos({ users, setUsers, me, notify, go }) {
+  const [f, setF] = useState({ name: '', email: '', password: '' });
   const [busy, setBusy] = useState(false);
+  const [mail, setMail] = useState(null);
+  useEffect(() => { api('mail').then(setMail).catch(() => setMail({ ready: false })); }, []);
   async function criar(e) {
     e.preventDefault(); setBusy(true);
-    try { await api('users', { method: 'POST', data: f }); setUsers(await api('users')); setF({ name: '', username: '', password: '' }); notify('Acesso criado. A pessoa troca a senha no primeiro login.'); } catch (err) { notify(err.message, 'erro'); }
+    try {
+      const out = await api('users', { method: 'POST', data: f }); setUsers(await api('users')); setF({ name: '', email: '', password: '' });
+      notify(out.invited ? 'Acesso criado. Enviamos um e-mail para a pessoa criar a senha.' : 'Acesso criado. A pessoa troca a senha no primeiro login.');
+    } catch (err) { notify(err.message, 'erro'); }
     setBusy(false);
   }
   async function remover(u) {
@@ -186,11 +192,11 @@ function Acessos({ users, setUsers, me, notify }) {
   }
   return (
     <>
-      <header className="p-head"><h1>Acessos</h1><p className="p-muted">Cada pessoa entra com o próprio usuário e senha.</p></header>
+      <header className="p-head"><h1>Acessos</h1><p className="p-muted">Cada pessoa entra com o próprio e-mail e senha.</p></header>
       <div className="p-card p-card--open">
         {users.map((u) => (
           <div className="p-row p-row--static" key={u.id}>
-            <span className="p-row-main"><b>{u.name}{u.id === me.id ? ' (você)' : ''}</b><small>{u.username}{u.mustChange ? ' · ainda com senha provisória' : ''}</small></span>
+            <span className="p-row-main"><b>{u.name}{u.id === me.id ? ' (você)' : ''}</b><small>{u.email || `${u.username} · sem e-mail cadastrado`}{u.mustChange ? ' · ainda com senha provisória' : ''}</small></span>
             {u.id !== me.id ? <button type="button" className="p-btn p-btn--ghost" onClick={() => remover(u)}>Remover</button> : null}
           </div>
         ))}
@@ -199,18 +205,74 @@ function Acessos({ users, setUsers, me, notify }) {
         <div className="p-card-body">
           <h2>Novo acesso</h2>
           <div className="p-field"><label>Nome<input value={f.name} onChange={(e) => setF({ ...f, name: e.target.value })} required /></label></div>
-          <div className="p-field"><label>Usuário<input value={f.username} onChange={(e) => setF({ ...f, username: e.target.value })} autoCapitalize="none" spellCheck={false} required /></label><p className="p-help">Letras minúsculas, números, ponto ou traço.</p></div>
-          <div className="p-field"><label>Senha provisória<input value={f.password} onChange={(e) => setF({ ...f, password: e.target.value })} autoComplete="off" required /></label><p className="p-help">Pelo menos 10 caracteres, com letras e números. Passe para a pessoa; ela será obrigada a trocar ao entrar.</p></div>
-          <button className="p-btn p-btn--primary" disabled={busy}>{busy ? 'Criando…' : 'Criar acesso'}</button>
+          <div className="p-field"><label>E-mail<input type="email" value={f.email} onChange={(e) => setF({ ...f, email: e.target.value })} autoCapitalize="none" spellCheck={false} required /></label></div>
+          {mail?.ready ? <p className="p-help">A pessoa recebe um e-mail com um link para criar a própria senha (vale 48 horas).</p> : (
+            <>
+              <div className="p-field"><label>Senha provisória<input value={f.password} onChange={(e) => setF({ ...f, password: e.target.value })} autoComplete="off" required /></label><p className="p-help">Pelo menos 10 caracteres, com letras e números. Passe para a pessoa; ela será obrigada a trocar ao entrar.</p></div>
+              <p className="p-help">Para convidar por e-mail em vez de combinar uma senha, <button type="button" className="p-linklike" onClick={() => go('email')}>configure o envio de e-mails</button>.</p>
+            </>
+          )}
+          <button className="p-btn p-btn--primary" disabled={busy}>{busy ? 'Criando…' : mail?.ready ? 'Criar acesso e enviar convite' : 'Criar acesso'}</button>
         </div>
       </form>
     </>
   );
 }
 
-function Senha({ locked, notify }) {
+function Email({ me, notify, go }) {
+  const [cfg, setCfg] = useState(null);
+  const [f, setF] = useState({ apiKey: '', from: '', siteUrl: '' });
+  const [busy, setBusy] = useState(false);
+  useEffect(() => { api('mail').then((c) => { setCfg(c); setF({ apiKey: '', from: c.from, siteUrl: c.siteUrl }); }).catch((e) => notify(e.message, 'erro')); }, []);
+  async function salvar(e) {
+    e.preventDefault(); setBusy(true);
+    try { const c = await api('mail', { method: 'PUT', data: f }); setCfg(c); setF({ apiKey: '', from: c.from, siteUrl: c.siteUrl }); notify('Configuração de e-mail salva.'); } catch (err) { notify(err.message, 'erro'); }
+    setBusy(false);
+  }
+  async function remover() {
+    if (!window.confirm('Remover a chave do Resend? A recuperação de senha por e-mail deixa de funcionar.')) return;
+    try { const c = await api('mail', { method: 'PUT', data: { removeKey: true } }); setCfg(c); notify('Chave removida.'); } catch (err) { notify(err.message, 'erro'); }
+  }
+  async function testar() {
+    setBusy(true);
+    try { const out = await api('mail-test', { method: 'POST' }); notify(`E-mail de teste enviado para ${out.to}.`); } catch (err) { notify(err.message, 'erro'); }
+    setBusy(false);
+  }
+  if (!cfg) return <header className="p-head"><h1>E-mail (Resend)</h1><p className="p-muted">Carregando…</p></header>;
+  return (
+    <>
+      <header className="p-head"><h1>E-mail (Resend)</h1><p className="p-muted">Usado para recuperar senha e convidar novos acessos.</p></header>
+      <p className={`p-status ${cfg.ready ? 'p-status--ok' : ''}`}>{cfg.ready ? 'Envio de e-mails ativo.' : cfg.hasKey ? 'Falta informar o remetente.' : 'Envio de e-mails desativado: falta a chave do Resend.'}</p>
+      <form className="p-card p-card--open" onSubmit={salvar}>
+        <div className="p-card-body">
+          <div className="p-field">
+            <label>Chave de API do Resend<input type="password" value={f.apiKey} onChange={(e) => setF({ ...f, apiKey: e.target.value })} autoComplete="off" spellCheck={false} placeholder={cfg.hasKey ? `Chave salva (${cfg.keyHint}). Deixe vazio para manter.` : 're_…'} /></label>
+            <p className="p-help">A chave vai direto do seu navegador para o servidor do site, fica cifrada no banco e nunca mais é exibida. Crie uma em resend.com → API Keys, com permissão só de envio ("Sending access").</p>
+            {cfg.hasKey ? <button type="button" className="p-btn p-btn--danger" onClick={remover}>Remover a chave salva</button> : null}
+          </div>
+          <div className="p-field"><label>Remetente<input value={f.from} onChange={(e) => setF({ ...f, from: e.target.value })} placeholder="Grupo Forte <painel@seudominio.com.br>" spellCheck={false} /></label><p className="p-help">O domínio do endereço precisa estar verificado no Resend (resend.com → Domains).</p></div>
+          <div className="p-field"><label>Endereço do site<input value={f.siteUrl} onChange={(e) => setF({ ...f, siteUrl: e.target.value })} spellCheck={false} /></label><p className="p-help">Usado nos links dos e-mails. Atualize quando o site ganhar o domínio definitivo.</p></div>
+          <button className="p-btn p-btn--primary" disabled={busy}>{busy ? 'Salvando…' : 'Salvar'}</button>
+        </div>
+      </form>
+      <div className="p-card p-card--open"><div className="p-card-body">
+        <h2>Testar o envio</h2>
+        {me.email ? <p className="p-muted">Envia um e-mail de teste para {me.email}.</p> : <p className="p-muted">Cadastre o seu e-mail em <button type="button" className="p-linklike" onClick={() => go('senha')}>Minha conta</button> para receber o teste.</p>}
+        <button type="button" className="p-btn" disabled={busy || !cfg.ready || !me.email} onClick={testar}>Enviar e-mail de teste</button>
+      </div></div>
+    </>
+  );
+}
+
+function Conta({ me, locked, notify }) {
+  const [a, setA] = useState({ name: me.name, email: me.email, current: '' });
   const [f, setF] = useState({ current: '', next: '', confirm: '' });
   const [busy, setBusy] = useState(false);
+  async function salvarConta(e) {
+    e.preventDefault(); setBusy(true);
+    try { await api('account', { method: 'PUT', data: a }); notify('Dados da conta salvos.'); setTimeout(() => window.location.reload(), 800); } catch (err) { notify(err.message, 'erro'); }
+    setBusy(false);
+  }
   async function trocar(e) {
     e.preventDefault();
     if (f.next !== f.confirm) return notify('As senhas novas não são iguais.', 'erro');
@@ -220,9 +282,21 @@ function Senha({ locked, notify }) {
   }
   return (
     <>
-      <header className="p-head"><h1>{locked ? 'Crie a sua senha' : 'Minha senha'}</h1><p className="p-muted">{locked ? 'Você entrou com uma senha provisória. Troque-a para liberar o painel.' : 'Troque a senha quando quiser.'}</p></header>
+      <header className="p-head"><h1>{locked ? 'Crie a sua senha' : 'Minha conta'}</h1><p className="p-muted">{locked ? 'Você entrou com uma senha provisória. Troque-a para liberar o painel.' : 'Seu e-mail é o seu login e é para onde vai o link de recuperação de senha.'}</p></header>
+      {!locked ? (
+        <form className="p-card p-card--open" onSubmit={salvarConta}>
+          <div className="p-card-body">
+            <h2>Nome e e-mail</h2>
+            <div className="p-field"><label>Nome<input value={a.name} onChange={(e) => setA({ ...a, name: e.target.value })} required /></label></div>
+            <div className="p-field"><label>E-mail<input type="email" value={a.email} onChange={(e) => setA({ ...a, email: e.target.value })} autoCapitalize="none" spellCheck={false} required /></label></div>
+            <div className="p-field"><label>Senha atual (para confirmar)<input type="password" value={a.current} onChange={(e) => setA({ ...a, current: e.target.value })} autoComplete="current-password" required /></label></div>
+            <button className="p-btn p-btn--primary" disabled={busy}>Salvar dados</button>
+          </div>
+        </form>
+      ) : null}
       <form className="p-card p-card--open" onSubmit={trocar}>
         <div className="p-card-body">
+          <h2>Senha</h2>
           <div className="p-field"><label>Senha atual<input type="password" value={f.current} onChange={(e) => setF({ ...f, current: e.target.value })} autoComplete="current-password" required /></label></div>
           <div className="p-field"><label>Nova senha<input type="password" value={f.next} onChange={(e) => setF({ ...f, next: e.target.value })} autoComplete="new-password" required /></label><p className="p-help">Pelo menos 10 caracteres, com letras e números.</p></div>
           <div className="p-field"><label>Repita a nova senha<input type="password" value={f.confirm} onChange={(e) => setF({ ...f, confirm: e.target.value })} autoComplete="new-password" required /></label></div>

@@ -119,3 +119,9 @@
 
 .p-aviso { margin: 0 0 20px; padding: 12px 16px; border: 1px solid #f0c2bd; border-radius: 10px; background: #fdf0ee; }
 .painel input[type="file"] { display: none; }
+
+.p-ok { margin-top: 16px; padding: 12px 14px; border-radius: 8px; background: #dff3e6; color: #17663a; font-weight: 600; }
+.p-auth-link { display: block; margin-top: 16px; color: var(--p-navy); font-weight: 600; text-align: center; text-decoration: underline; }
+.p-linklike { padding: 0; border: 0; background: none; color: var(--p-navy); font: inherit; font-weight: 600; text-decoration: underline; cursor: pointer; }
+.p-status { margin-bottom: 16px; padding: 12px 16px; border-radius: 10px; background: #fff4e5; color: #8a4500; font-weight: 600; }
+.p-status--ok { background: #dff3e6; color: #17663a; }
