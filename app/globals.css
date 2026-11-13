@@ -625,6 +625,93 @@ button { font: inherit; cursor: pointer; }
   .post-inner .btn { align-self: center; }
 }
 
+/* ================= Celular: acabamento ================= */
+@media (max-width: 1023px) {
+  /* Cabeçalho fixo e compacto: o menu fica sempre à mão */
+  .header { position: sticky; top: 0; height: 72px; background: rgba(244, 244, 244, 0.9); -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px); z-index: 50; }
+  .nav { top: 68px; }
+  [id] { scroll-margin-top: 88px; }
+}
+@media (max-width: 767px) {
+  .header { height: 68px; }
+  .nav { top: 64px; }
+  .header-logo img { width: 168px; }
+  .nav-toggle { width: 44px; height: 44px; }
+
+  /* Hero ocupa a primeira tela sem empurrar o conteúdo para longe */
+  .hero { height: 76vh; height: 76svh; min-height: 400px; align-items: center; }
+  .hero > img { width: min(320px, 88%); }
+  .page-hero { height: 34vh; min-height: 200px; }
+  .page-hero h1 { font-size: 30px; }
+
+  /* Ritmo único entre seções e títulos */
+  .servicos, .parceiros, .noticias { padding-top: 64px; }
+  .h-display, .h-section, .info-head h2 { font-size: 26px; line-height: 1.15; }
+  .h-light { font-size: 25px; line-height: 1.15; }
+  .eyebrow { font-size: 13px; letter-spacing: 2px; }
+
+  /* Marcas e notícias: fileira para deslizar com o dedo, em vez de uma pilha longa */
+  .brand-grid, .post-grid { display: flex; gap: 12px; margin-left: calc(-1 * var(--gutter)); margin-right: calc(-1 * var(--gutter)); padding: 0 var(--gutter) 8px; overflow-x: auto; scroll-snap-type: x mandatory; scroll-padding: 0 var(--gutter); -webkit-overflow-scrolling: touch; scrollbar-width: none; }
+  .brand-grid::-webkit-scrollbar, .post-grid::-webkit-scrollbar { display: none; }
+  .brand-card, .post-card { flex: 0 0 82%; scroll-snap-align: start; }
+  .brand-card-img { height: 190px; min-height: 0; }
+  .brand-card-body { padding: 24px 20px; gap: 12px; }
+  .brand-card-body p { margin-bottom: 4px; }
+  .post-card { background: #fff; border-radius: 15px; padding-bottom: 16px; box-shadow: 0 6px 20px rgba(0, 59, 110, 0.08); }
+  .post-card-img, .post-card-img img { border-radius: 15px 15px 0 0; }
+  .post-card-meta, .post-card-foot { padding: 0 16px; }
+  .post-card-badge { right: 16px; }
+  .noticias .btn-cta--hover { margin-top: 28px; }
+  /* Nas listagens (Notícias e categorias) os cartões ficam empilhados */
+  .noticias--page .post-grid { flex-direction: column; overflow: visible; margin: 0; padding: 0; gap: 20px; }
+  .noticias--page .post-card { flex: none; }
+  .marcas { padding-bottom: 80px; }
+
+  /* Unidades em cartões translúcidos */
+  .unidades { margin-top: 48px; gap: 24px; padding: 0; }
+  .unidades-grid { gap: 12px; }
+  .unidade { padding: 18px 16px; border: 1px solid rgba(255, 255, 255, 0.14); border-radius: 12px; background: rgba(255, 255, 255, 0.05); }
+  .unidade-local .icon { width: 20px; height: 20px; }
+
+  /* Contadores */
+  .counters { border-radius: 20px; box-shadow: 0 12px 28px rgba(252, 106, 4, 0.28); }
+  .counter-number { font-size: 34px; }
+  .counter-title { font-size: 13px; }
+
+  /* Instagram e serviços mais compactos */
+  .insta-card { padding: 28px 24px; gap: 16px; }
+  .insta-card h4 { padding-bottom: 0; }
+  .insta-arte { height: auto; min-height: 0; aspect-ratio: 4 / 5; }
+  .servicos-grid { gap: 12px; margin-top: 28px; }
+  .servico { padding: 24px 20px; gap: 8px; border-color: rgba(51, 51, 51, 0.25); background: #fff; }
+  .servico-head { gap: 12px; }
+  .servico-head .icon { width: 56px; height: 56px; }
+  .servico-head h3 { font-size: 21px; }
+  .servico p { margin-bottom: 8px; }
+
+  /* Informações */
+  .info { padding: 64px 0 150px; }
+  .info-body > p { padding: 20px 16px 24px; }
+  .info-card { border-radius: 20px; padding: 4px; }
+
+  /* Parceiros */
+  .parceiros-panel { border-radius: 20px; }
+
+  /* Rodapé */
+  .footer { padding: 48px 0 32px; }
+  .footer hr { margin: 16px 0 20px; opacity: 0.4; }
+  .footer-title { font-size: 16px; letter-spacing: 1px; }
+  .copyright { padding: 16px 24px 28px; }
+
+  /* Sobre nós */
+  .mvv-grid { gap: 12px; }
+  .mvv-card { gap: 16px; padding: 24px 20px; border-width: 2px; border-radius: 20px; }
+  .mvv-card h2 { font-size: 26px; }
+  .mvv-card img { width: 88px; height: 88px; }
+  .sobre-foto { height: 380px; }
+  .lider-video { border-radius: 20px; }
+}
+
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
   .js-reveal [data-reveal], .js-reveal [data-reveal].is-in { opacity: 1; animation: none; }
