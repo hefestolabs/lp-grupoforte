@@ -23,6 +23,12 @@ export default function Header() {
                 )}
               </li>
             ))}
+            <li className="nav-cta">
+              <a className="btn btn-cta" href={SITE.whatsapp}>
+                <span>Entre em contato</span>
+                <Icon name="e-fas-phone-square-alt" size={16} />
+              </a>
+            </li>
           </ul>
         </nav>
         <button className="nav-toggle" type="button" aria-expanded={open} aria-label={open ? 'Fechar menu' : 'Abrir menu'} onClick={() => setOpen(!open)}>

@@ -23,6 +23,10 @@ Réplica fiel em código: home, cabeçalho, rodapé, Sobre nós, Produtos, Traba
 
 Diferenças propositais em relação ao original:
 
+- Alturas dos blocos seguem a tela, como no original: hero 90vh, imagem das marcas 30vh, arte do Instagram 55vh, banner interno 50vh, banner de Sobre nós 45vh.
+- Montserrat é servida pelo próprio site (`public/fonts`); o original só mostra a fonte em aparelhos que a têm instalada.
+- Efeitos de entrada (fadeInUp) em um conjunto reduzido de blocos; vídeo de fundo do YouTube no hero.
+- Tablet (até 1023px) usa menu sanfona; no original o layout de tablet quebra.
 - Contadores no celular em grade 2x2 (no original ficam ilegíveis).
 - Título "Marcas fortes que entregam valor" em branco no celular (no original fica azul sobre azul).
 - Página de notícia com layout próprio (no original é o tema padrão com formulário de comentários).
