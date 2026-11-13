@@ -1,6 +1,6 @@
-# Grupo Forte
+# LP Grupo Forte
 
-Repositório do projeto Grupo Forte.
+Repositório da landing page do Grupo Forte.
 
 ## Estrutura
 
