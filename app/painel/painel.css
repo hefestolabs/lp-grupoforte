@@ -235,3 +235,28 @@
 /* O seletor de página só aparece quando as abas não cabem */
 .painel .ed-page { display: none; }
 @media (max-width: 1100px) { .painel .ed-page { display: block; } }
+
+/* ================= Telas de acesso: cartão escuro com brilho laranja ================= */
+.p-auth { position: relative; overflow: hidden; background: #08090b; }
+.p-auth::before { content: ''; position: absolute; inset: 0; background: radial-gradient(60% 50% at 50% 0%, rgba(0, 59, 110, 0.35), transparent 70%); pointer-events: none; }
+.p-auth-card { position: relative; overflow: hidden; max-width: 392px; padding: 40px 34px 34px; border: 1px solid rgba(255, 255, 255, 0.09); border-radius: 28px; background: linear-gradient(180deg, rgba(255, 255, 255, 0.055), rgba(255, 255, 255, 0.02)) #101114; box-shadow: 0 30px 80px rgba(0, 0, 0, 0.6); color: #f4f5f7; }
+.p-auth-card::before { content: ''; position: absolute; right: -90px; top: -110px; width: 320px; height: 320px; border-radius: 50%; background: radial-gradient(circle, rgba(238, 115, 2, 0.5), rgba(238, 115, 2, 0.12) 45%, transparent 70%); filter: blur(8px); pointer-events: none; }
+.p-auth-card > * { position: relative; }
+.p-auth-card img { width: 132px; margin-bottom: 28px; }
+.painel .p-auth-card h1 { font-size: 27px; letter-spacing: -0.02em; color: #fff; }
+.p-auth-card .p-muted { margin: 8px 0 22px; color: #a2a7b0; }
+.p-auth-card label { margin-top: 12px; }
+.painel .p-auth-card input { margin: 0; padding: 15px 16px; border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 14px; background: rgba(255, 255, 255, 0.06); color: #fff; }
+.painel .p-auth-card input::placeholder { color: #8b919b; }
+.painel .p-auth-card input:focus { outline: 2px solid #ff9a3d; outline-offset: 0; border-color: transparent; background: rgba(255, 255, 255, 0.09); }
+.painel .p-auth-card input:-webkit-autofill { -webkit-text-fill-color: #fff; box-shadow: 0 0 0 100px #1b1d22 inset; caret-color: #fff; }
+.p-auth-forgot { display: block; margin-top: 14px; color: #ffb27a; font-size: 14px; font-weight: 600; text-align: right; }
+.p-auth-forgot:hover, .p-auth-card .p-auth-link:hover { text-decoration: underline; }
+.p-auth-card .p-btn--primary { min-height: 52px; margin-top: 18px; border: 0; border-radius: 14px; background: #fff; color: #0b0c0e; font-size: 16px; font-weight: 700; }
+.p-auth-card .p-btn--primary:hover:not(:disabled) { background: #e7e9ee; border: 0; }
+.p-auth-card .p-auth-link { color: #ffb27a; text-decoration: none; }
+.p-auth-card .p-help { color: #8b919b; }
+.p-auth-card .p-error { padding: 10px 12px; border-radius: 10px; background: rgba(255, 99, 82, 0.14); color: #ff9d92; }
+.p-auth-card .p-ok { background: rgba(60, 200, 120, 0.14); color: #8be0ad; }
+@media (max-width: 480px) { .p-auth { padding: 16px; } .p-auth-card { padding: 32px 22px 26px; border-radius: 24px; } }
+.p-auth-card img { margin-left: -12px; }
