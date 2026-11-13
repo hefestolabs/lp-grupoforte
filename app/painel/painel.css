@@ -371,3 +371,24 @@
 @media (max-width: 520px) { .d-stats { grid-template-columns: minmax(0, 1fr); } .painel .d-hello h1 { font-size: 24px; } }
 
 .p-top-title { font-family: var(--font-head); font-size: 17px; font-weight: 700; color: var(--p-muted); }
+
+/* Teste de velocidade */
+.d-span3 { grid-column: 1 / -1; }
+.d-speed .d-card-head { flex-wrap: wrap; }
+.d-speed-status { color: var(--p-muted); font-weight: 600; }
+.d-speed-sum { margin-bottom: 14px; padding: 12px 16px; border-radius: 10px; }
+.d-speed--ok { background: #dff3e6; color: #17663a; } .d-speed--meio { background: #fff4e5; color: #8a4500; } .d-speed--ruim { background: #fdecea; color: #b42318; }
+.d-speed-table { border: 1px solid var(--p-line); border-radius: 10px; overflow: hidden; }
+.d-speed-row { display: grid; grid-template-columns: 1.6fr 1fr 1.2fr 0.8fr 0.7fr 0.9fr; gap: 12px; align-items: center; padding: 11px 14px; border-top: 1px solid var(--p-line); font-size: 14px; font-variant-numeric: tabular-nums; }
+.d-speed-row:first-child { border-top: 0; }
+.d-speed-head { background: #f1f3f6; color: var(--p-muted); font-size: 12px; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; }
+.d-speed-tag { display: inline-block; padding: 2px 10px; border-radius: 99px; font-style: normal; font-size: 12px; font-weight: 700; }
+.d-speed-err { grid-column: 2 / -1; color: #b42318; }
+.d-speed .p-help { margin-top: 12px; }
+@media (max-width: 760px) {
+  .d-speed-head { display: none; }
+  .d-speed-row { grid-template-columns: 1fr 1fr; gap: 4px 12px; }
+  .d-speed-row span:first-child { grid-column: 1 / -1; }
+  .d-speed-row span:nth-child(2)::before { content: 'Carregamento: '; color: var(--p-muted); } .d-speed-row span:nth-child(3)::before { content: 'Servidor: '; color: var(--p-muted); }
+  .d-speed-row span:nth-child(4)::before { content: 'Peso: '; color: var(--p-muted); } .d-speed-row span:nth-child(5)::before { content: 'Arquivos: '; color: var(--p-muted); }
+}

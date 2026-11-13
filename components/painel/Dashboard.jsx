@@ -1,6 +1,7 @@
 'use client';
 import { useMemo, useState } from 'react';
 import { Avatar, Ico, roleName } from './ui';
+import SpeedTest from './SpeedTest';
 
 const MESES = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
 const CORES = ['#003b6e', '#ee7302', '#1a7f5a', '#7a4fd1', '#c2410c', '#0e7490'];
@@ -111,6 +112,8 @@ export default function Dashboard({ user, posts, users, go, openPost }) {
             ))}
           </div>
         </section>
+
+        <SpeedTest />
       </div>
     </div>
   );
