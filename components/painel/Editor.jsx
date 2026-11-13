@@ -2,24 +2,24 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { api } from './api';
 import { Field } from './Fields';
+import { ProfileMenu } from './ui';
 
 const DEVICES = [['desktop', 'Computador', '100%'], ['tablet', 'Tablet', '820px'], ['celular', 'Celular', '390px']];
 
 // Editor visual: prévia do site real à direita, campos da parte escolhida à esquerda.
-export default function Editor({ schema, content, setContent, saved, setSaved, notify, user, goTab, logout }) {
+export default function Editor({ schema, content, setContent, saved, setSaved, notify, user, goTab, logout, startPage = 'home' }) {
   const pages = useMemo(() => [
     { id: 'home', label: 'Página inicial', short: 'Home', path: '/', section: 'home' },
     { id: 'sobre', label: 'Sobre nós', short: 'Sobre nós', path: '/sobre-nos/', section: 'sobre' },
     { id: 'produtos', label: 'Produtos', short: 'Produtos', path: '/produtos/', section: 'paginas', only: ['produtos'], extra: [['home', 'marcas']] },
     { id: 'trabalhe', label: 'Trabalhe conosco', short: 'Trabalhe conosco', path: '/trabalhe-conosco/', section: 'paginas', only: ['trabalhe'] },
   ], []);
-  const [pageId, setPageId] = useState('home');
+  const [pageId, setPageId] = useState(startPage);
   const [sel, setSel] = useState(null); // "seção:grupo"
   const [device, setDevice] = useState('desktop');
   const [busy, setBusy] = useState(false);
   const [state, setState] = useState('pronto'); // pronto | atualizando
   const [showPreview, setShowPreview] = useState(false); // só no celular
-  const [more, setMore] = useState(false);
   const frame = useRef(null);
   const box = useRef(null);
   const [scale, setScale] = useState(1); // em "Computador" a prévia é montada a 1440px e reduzida para caber
@@ -90,7 +90,7 @@ export default function Editor({ schema, content, setContent, saved, setSaved, n
   return (
     <div className={`ed ${showPreview ? 'ed--preview' : ''}`}>
       <header className="ed-bar">
-        <img className="ed-logo" src="/img/logo-branco.png" alt="Grupo Forte" width="120" height="34" />
+        <button type="button" className="ed-home" onClick={() => leave('inicio')} aria-label="Voltar ao início do painel">← Início</button>
         <nav className="ed-tabs" aria-label="Página que está sendo editada">
           {pages.map((p) => <button type="button" key={p.id} className={pageId === p.id ? 'is-active' : ''} aria-current={pageId === p.id ? 'page' : undefined} onClick={() => setPageId(p.id)}>{p.short}</button>)}
         </nav>
@@ -104,19 +104,7 @@ export default function Editor({ schema, content, setContent, saved, setSaved, n
         <span className={`ed-state ${dirty ? 'is-dirty' : ''}`}>{state === 'atualizando' ? 'Atualizando a prévia…' : dirty ? 'Alterações não publicadas' : 'Tudo publicado'}</span>
         {dirty ? <button type="button" className="ed-btn" onClick={discard}>Descartar</button> : null}
         <button type="button" className="ed-btn ed-btn--primary" disabled={!dirty || busy} onClick={publish}>{busy ? 'Publicando…' : 'Publicar'}</button>
-        <div className="ed-more">
-          <button type="button" className="ed-btn" aria-expanded={more} onClick={() => setMore(!more)}>Menu</button>
-          {more ? (
-            <div className="ed-more-list">
-              <button type="button" onClick={() => leave('noticias')}>Notícias</button>
-              {user.admin ? <button type="button" onClick={() => leave('acessos')}>Acessos</button> : null}
-              {user.admin ? <button type="button" onClick={() => leave('email')}>E-mail (Resend)</button> : null}
-              <button type="button" onClick={() => leave('senha')}>Minha conta</button>
-              <a href="/" target="_blank" rel="noopener">Ver o site ↗</a>
-              <button type="button" onClick={logout}>Sair</button>
-            </div>
-          ) : null}
-        </div>
+        <ProfileMenu dark user={user} onLogout={logout} items={[['Início', () => leave('inicio')], ['Notícias', () => leave('noticias')], ...(user.admin ? [['Acessos', () => leave('acessos')], ['E-mail (Resend)', () => leave('email')]] : []), ['Minha conta', () => leave('senha')]]} />
       </header>
 
       <aside className="ed-panel">

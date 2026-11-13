@@ -3,11 +3,15 @@ import { useEffect, useMemo, useState } from 'react';
 import { api } from './api';
 import { Field } from './Fields';
 import Editor from './Editor';
+import Dashboard from './Dashboard';
+import { Avatar, Ico, ProfileMenu, roleName } from './ui';
 
 const hoje = () => new Date().toISOString().slice(0, 10);
 
 export default function PainelApp({ storeMode, user, schema, initialContent, initialPosts, initialUsers }) {
-  const [tab, setTab] = useState(user.mustChange ? 'senha' : 'editor');
+  const [tab, setTab] = useState(user.mustChange ? 'senha' : 'inicio');
+  const [editorPage, setEditorPage] = useState('home');
+  const [openPostId, setOpenPostId] = useState(0);
   const [content, setContent] = useState(initialContent);
   const [saved, setSaved] = useState(initialContent);
   const [posts, setPosts] = useState(initialPosts);
@@ -45,12 +49,16 @@ export default function PainelApp({ storeMode, user, schema, initialContent, ini
   }
   async function logout() { await api('logout', { method: 'POST' }).catch(() => {}); window.location.href = '/painel/login/'; }
 
-  const nav = [['editor', 'Editar o site'], ['noticias', 'Notícias'], ...(user.admin ? [['acessos', 'Acessos'], ['email', 'E-mail (Resend)']] : []), ['senha', 'Minha conta']];
+  const nav = [['inicio', 'Início', 'home'], ['editor', 'Editar o site', 'edit'], ['noticias', 'Notícias', 'news'], ...(user.admin ? [['acessos', 'Acessos', 'users'], ['email', 'E-mail (Resend)', 'mail']] : []), ['senha', 'Minha conta', 'user']];
+  const titles = Object.fromEntries(nav.map(([id, label]) => [id, label]));
+  // Navegação com destino composto: 'editor:sobre' abre o editor naquela página; 'noticias:nova' abre o formulário.
+  const open = (t) => { if (locked) return; const [name, mode] = t.split(':'); if (name === 'editor' && mode) setEditorPage(mode); setStartNew(name === 'noticias' && mode === 'nova' ? Date.now() : 0); if (name !== 'noticias' || mode === 'nova') setOpenPostId(0); setTab(name); setMenu(false); window.scrollTo(0, 0); };
+  const profileItems = [['Início', () => open('inicio')], ['Minha conta', () => open('senha')]];
 
   if (tab === 'editor') {
     return (
       <>
-        <Editor schema={schema} content={content} setContent={setContent} saved={saved} setSaved={setSaved} notify={notify} user={user} goTab={(t) => { const [name, mode] = t.split(':'); setStartNew(mode === 'nova' ? Date.now() : 0); setTab(name); window.scrollTo(0, 0); }} logout={logout} />
+        <Editor schema={schema} content={content} setContent={setContent} saved={saved} setSaved={setSaved} notify={notify} user={user} goTab={open} logout={logout} startPage={editorPage} />
         {storeMode !== 'mysql' ? <p className="p-error p-aviso ed-aviso" role="alert">Atenção: o banco de dados não está conectado. As alterações se perdem na próxima publicação do site.</p> : null}
         {toast ? <div className={`p-toast p-toast--${toast.kind}`} role="status">{toast.text}</div> : null}
       </>
@@ -65,18 +73,25 @@ export default function PainelApp({ storeMode, user, schema, initialContent, ini
           <button type="button" className="p-menu-btn" aria-expanded={menu} onClick={() => setMenu(!menu)}>Menu</button>
         </div>
         <nav aria-label="Seções do painel">
-          {nav.map(([id, label]) => <button type="button" key={id} className={tab === id ? 'is-active' : ''} aria-current={tab === id ? 'page' : undefined} disabled={locked && id !== 'senha'} onClick={() => go(id)}>{label}</button>)}
+          {nav.map(([id, label, icon]) => <button type="button" key={id} className={tab === id ? 'is-active' : ''} aria-current={tab === id ? 'page' : undefined} disabled={locked && id !== 'senha'} onClick={() => open(id)}><Ico name={icon} />{label}</button>)}
         </nav>
         <div className="p-side-foot">
           <a href="/" target="_blank" rel="noopener">Ver o site ↗</a>
-          <span>{user.name}</span>
-          <button type="button" onClick={logout}>Sair</button>
+          <div className="p-side-me"><Avatar name={user.name} size={36} tone="orange" /><span><b>{user.name}</b><small>{roleName(user)}</small></span></div>
         </div>
       </aside>
 
-      <main className="p-main">
+      <div className="p-body">
+        <header className="p-top">
+          <p className="p-top-title">{titles[tab] || 'Painel'}</p>
+          {storeMode !== 'mysql' ? <span className="p-pill p-pill--bad">Banco desconectado</span> : null}
+          <span className="p-top-grow" />
+          {!locked ? <button type="button" className="p-btn" onClick={() => open('noticias:nova')}>+ Nova notícia</button> : null}
+          <ProfileMenu user={user} items={locked ? [] : profileItems} onLogout={logout} />
+        </header>
+      <main className={`p-main ${tab === 'inicio' ? 'p-main--wide' : ''}`}>
         {storeMode !== 'mysql' ? <p className="p-error p-aviso" role="alert">Atenção: o banco de dados não está conectado. As alterações ficam em um arquivo temporário e se perdem na próxima publicação do site. Avise o suporte.</p> : null}
-        {tab === 'inicio' ? <Inicio go={go} posts={posts} schema={schema} user={user} /> : null}
+        {tab === 'inicio' ? <Dashboard user={user} posts={posts} users={users} go={open} openPost={(p) => { setOpenPostId(p.id); setStartNew(0); setTab('noticias'); window.scrollTo(0, 0); }} /> : null}
 
         {section ? (
           <>
@@ -97,11 +112,12 @@ export default function PainelApp({ storeMode, user, schema, initialContent, ini
           </>
         ) : null}
 
-        {tab === 'noticias' ? <Noticias posts={posts} setPosts={setPosts} notify={notify} startNew={startNew} /> : null}
+        {tab === 'noticias' ? <Noticias posts={posts} setPosts={setPosts} notify={notify} startNew={startNew} openId={openPostId} /> : null}
         {user.admin && tab === 'acessos' ? <Acessos users={users} setUsers={setUsers} me={user} notify={notify} go={go} /> : null}
         {user.admin && tab === 'email' ? <Email me={user} notify={notify} go={go} /> : null}
         {tab === 'senha' ? <Conta me={user} locked={locked} notify={notify} /> : null}
       </main>
+      </div>
 
       {toast ? <div className={`p-toast p-toast--${toast.kind}`} role="status">{toast.text}</div> : null}
     </div>
@@ -122,7 +138,7 @@ function Inicio({ go, posts, schema, user }) {
   );
 }
 
-function Noticias({ posts, setPosts, notify, startNew }) {
+function Noticias({ posts, setPosts, notify, startNew, openId }) {
   const [edit, setEdit] = useState(null);
   const [busy, setBusy] = useState(false);
   const categorias = useMemo(() => [...new Set(posts.map((p) => p.categories[0]?.name).filter(Boolean))], [posts]);
@@ -130,6 +146,7 @@ function Noticias({ posts, setPosts, notify, startNew }) {
   const abrir = (p) => setEdit({ id: p.id, title: p.title, category: p.categories[0]?.name || '', date: p.date.slice(0, 10), time: p.date.slice(11, 19), image: p.image?.src || '', imageAlt: p.image?.alt || '', excerpt: p.excerpt, content: p.content, status: p.status, slug: p.slug });
   const set = (k) => (v) => setEdit((e) => ({ ...e, [k]: v }));
   useEffect(() => { if (startNew) novo(); }, [startNew]);
+  useEffect(() => { const p = posts.find((x) => x.id === openId); if (p) abrir(p); }, [openId]);
   async function reload() { setPosts(await api('posts')); }
   async function salvar() {
     setBusy(true);
