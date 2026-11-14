@@ -24,11 +24,11 @@ Site e painel do Grupo Forte (Next.js), publicado na Hostinger. Estas regras val
 
 ## Qualidade de código
 
-| Comando | O que verifica |
-|---|---|
-| `npm run lint` | Lint e formatação com Biome (`npm run lint:fix` corrige o que for automático) |
-| `npm run knip` | Arquivos, exports e dependências sem uso |
-| `npm run arch` | Contrato de arquitetura (`.dependency-cruiser.cjs`) |
-| `npm run quality` | Os três acima |
+| Comando           | O que verifica                                                                |
+| ----------------- | ----------------------------------------------------------------------------- |
+| `npm run lint`    | Lint e formatação com Biome (`npm run lint:fix` corrige o que for automático) |
+| `npm run knip`    | Arquivos, exports e dependências sem uso                                      |
+| `npm run arch`    | Contrato de arquitetura (`.dependency-cruiser.cjs`)                           |
+| `npm run quality` | Os três acima                                                                 |
 
 Contrato de arquitetura: `lib/` não importa de `components/` nem de `app/`; componentes não importam rotas; o site público não importa código do painel; componentes do painel (navegador) não importam módulos de servidor de `lib/`; sem dependências circulares.
