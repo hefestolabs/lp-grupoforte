@@ -4,6 +4,7 @@ import { api } from './api';
 import { Field } from './Fields';
 import Editor from './Editor';
 import Dashboard from './Dashboard';
+import SupportChat from './SupportChat';
 import { Avatar, Ico, ProfileMenu, roleName } from './ui';
 
 const hoje = () => new Date().toISOString().slice(0, 10);
@@ -49,10 +50,11 @@ export default function PainelApp({ storeMode, user, schema, initialContent, ini
   }
   async function logout() { await api('logout', { method: 'POST' }).catch(() => {}); window.location.href = '/painel/login/'; }
 
-  const nav = [['inicio', 'Início', 'home'], ['editor', 'Editar o site', 'edit'], ['noticias', 'Notícias', 'news'], ...(user.admin ? [['acessos', 'Acessos', 'users'], ['email', 'E-mail (Resend)', 'mail']] : []), ['senha', 'Minha conta', 'user']];
+  const nav = [['inicio', 'Início', 'home'], ['editor', 'Editar o site', 'edit'], ['noticias', 'Notícias', 'news'], ...(user.admin ? [['acessos', 'Acessos', 'users'], ['email', 'E-mail (Resend)', 'mail'], ['suporte', 'Suporte (IA e CRM)', 'chat']] : []), ['senha', 'Minha conta', 'user']];
   const titles = Object.fromEntries(nav.map(([id, label]) => [id, label]));
   // Navegação com destino composto: 'editor:sobre' abre o editor naquela página; 'noticias:nova' abre o formulário.
   const open = (t) => { if (locked) return; const [name, mode] = t.split(':'); if (name === 'editor' && mode) setEditorPage(mode); setStartNew(name === 'noticias' && mode === 'nova' ? Date.now() : 0); if (name !== 'noticias' || mode === 'nova') setOpenPostId(0); setTab(name); setMenu(false); window.scrollTo(0, 0); };
+  const chat = locked ? null : <SupportChat user={user} admin={user.admin} screen={tab === 'editor' ? 'Editar o site' : titles[tab]} goSettings={() => open('suporte')} />;
   const profileItems = [['Início', () => open('inicio')], ['Minha conta', () => open('senha')]];
 
   if (tab === 'editor') {
@@ -61,6 +63,7 @@ export default function PainelApp({ storeMode, user, schema, initialContent, ini
         <Editor schema={schema} content={content} setContent={setContent} saved={saved} setSaved={setSaved} notify={notify} user={user} goTab={open} logout={logout} startPage={editorPage} />
         {storeMode !== 'mysql' ? <p className="p-error p-aviso ed-aviso" role="alert">Atenção: o banco de dados não está conectado. As alterações se perdem na próxima publicação do site.</p> : null}
         {toast ? <div className={`p-toast p-toast--${toast.kind}`} role="status">{toast.text}</div> : null}
+        {chat}
       </>
     );
   }
@@ -115,11 +118,13 @@ export default function PainelApp({ storeMode, user, schema, initialContent, ini
         {tab === 'noticias' ? <Noticias posts={posts} setPosts={setPosts} notify={notify} startNew={startNew} openId={openPostId} /> : null}
         {user.admin && tab === 'acessos' ? <Acessos users={users} setUsers={setUsers} me={user} notify={notify} go={go} /> : null}
         {user.admin && tab === 'email' ? <Email me={user} notify={notify} go={go} /> : null}
+        {user.admin && tab === 'suporte' ? <Suporte notify={notify} /> : null}
         {tab === 'senha' ? <Conta me={user} locked={locked} notify={notify} /> : null}
       </main>
       </div>
 
       {toast ? <div className={`p-toast p-toast--${toast.kind}`} role="status">{toast.text}</div> : null}
+      {chat}
     </div>
   );
 }
@@ -349,6 +354,68 @@ function Conta({ me, locked, notify }) {
           <button className="p-btn p-btn--primary" disabled={busy}>{busy ? 'Salvando…' : 'Trocar senha'}</button>
         </div>
       </form>
+    </>
+  );
+}
+
+function Suporte({ notify }) {
+  const [cfg, setCfg] = useState(null);
+  const [f, setF] = useState({ apiKey: '', webhookUrl: '', webhookSecret: '' });
+  const [tickets, setTickets] = useState([]);
+  const [busy, setBusy] = useState(false);
+  const loadTickets = () => api('support/tickets').then((d) => setTickets(d.tickets)).catch(() => {});
+  useEffect(() => { api('support/settings').then((c) => { setCfg(c); setF({ apiKey: '', webhookUrl: c.webhookUrl, webhookSecret: '' }); }).catch((e) => notify(e.message, 'erro')); loadTickets(); }, []);
+  async function salvar(e) {
+    e.preventDefault(); setBusy(true);
+    try { const c = await api('support/settings', { method: 'PUT', data: f }); setCfg(c); setF({ apiKey: '', webhookUrl: c.webhookUrl, webhookSecret: '' }); notify('Configuração do suporte salva.'); } catch (err) { notify(err.message, 'erro'); }
+    setBusy(false);
+  }
+  async function remover(what) {
+    if (!window.confirm(what === 'removeKey' ? 'Remover a chave da IA? O chat passa a mostrar só o formulário de demanda.' : 'Remover o segredo do CRM?')) return;
+    try { setCfg(await api('support/settings', { method: 'PUT', data: { [what]: true } })); notify('Removido.'); } catch (err) { notify(err.message, 'erro'); }
+  }
+  async function testar() {
+    setBusy(true);
+    try { const out = await api('support/test-crm', { method: 'POST' }); notify(`Demanda de teste entregue ao CRM (${out.detail}).`); } catch (err) { notify(`O CRM não aceitou o teste: ${err.message}`, 'erro'); }
+    setBusy(false);
+  }
+  async function reenviar(id) {
+    try { const out = await api('support/tickets', { method: 'POST', data: { id } }); notify(out.crm === 'enviado' ? `Demanda #${id} enviada ao CRM.` : `Não foi enviada: ${out.detail}`, out.crm === 'enviado' ? 'ok' : 'erro'); loadTickets(); } catch (err) { notify(err.message, 'erro'); }
+  }
+  if (!cfg) return <header className="p-head"><h1>Suporte (IA e CRM)</h1><p className="p-muted">Carregando…</p></header>;
+  return (
+    <>
+      <header className="p-head"><h1>Suporte (IA e CRM)</h1><p className="p-muted">Configura o chat de suporte do canto inferior direito. Só você, administrador, vê esta tela.</p></header>
+      <p className={`p-status ${cfg.hasKey && cfg.webhookUrl ? 'p-status--ok' : ''}`}>
+        {cfg.hasKey ? 'Assistente com IA ligado.' : 'Assistente com IA desligado: o chat mostra só o formulário de demanda.'} {cfg.webhookUrl ? 'Demandas são enviadas ao CRM.' : 'Sem CRM configurado: as demandas ficam guardadas aqui no painel.'}
+      </p>
+      <form className="p-card p-card--open" onSubmit={salvar}>
+        <div className="p-card-body">
+          <h2>Assistente com IA</h2>
+          <div className="p-field">
+            <label>Chave de API da Anthropic (Claude)<input type="password" value={f.apiKey} onChange={(e) => setF({ ...f, apiKey: e.target.value })} autoComplete="off" spellCheck={false} placeholder={cfg.hasKey ? `Chave salva (${cfg.keyHint}). Deixe vazio para manter.` : 'sk-ant-…'} /></label>
+            <p className="p-help">Crie em console.anthropic.com → API Keys. A chave vai direto do seu navegador para o servidor do site, fica cifrada no banco e nunca mais é exibida. O uso é cobrado na conta dessa chave.</p>
+            {cfg.hasKey ? <button type="button" className="p-btn p-btn--danger" onClick={() => remover('removeKey')}>Remover a chave salva</button> : null}
+          </div>
+          <h2>CRM (demandas)</h2>
+          <div className="p-field"><label>Endereço que recebe as demandas (webhook)<input value={f.webhookUrl} onChange={(e) => setF({ ...f, webhookUrl: e.target.value })} placeholder="https://seu-crm.com/api/demandas" spellCheck={false} /></label><p className="p-help">Cada demanda é enviada por POST em JSON, com título, descrição, prioridade, solicitante e a conversa.</p></div>
+          <div className="p-field">
+            <label>Segredo do webhook (opcional)<input type="password" value={f.webhookSecret} onChange={(e) => setF({ ...f, webhookSecret: e.target.value })} autoComplete="off" spellCheck={false} placeholder={cfg.hasSecret ? 'Segredo salvo. Deixe vazio para manter.' : 'Enviado no cabeçalho X-Webhook-Secret'} /></label>
+            {cfg.hasSecret ? <button type="button" className="p-btn p-btn--danger" onClick={() => remover('removeSecret')}>Remover o segredo</button> : null}
+          </div>
+          <div className="p-row-actions"><button className="p-btn p-btn--primary" disabled={busy}>{busy ? 'Salvando…' : 'Salvar'}</button><button type="button" className="p-btn" disabled={busy || !cfg.webhookUrl} onClick={testar}>Enviar demanda de teste ao CRM</button></div>
+        </div>
+      </form>
+      <div className="p-card p-card--open">
+        <div className="p-card-body"><h2>Demandas abertas pelo painel</h2></div>
+        {tickets.length ? tickets.map((t) => (
+          <div className="p-row p-row--static p-row--top" key={t.id}>
+            <span className="p-row-main"><b>#{t.id} · {t.title}</b><small>{new Date(String(t.at).replace(' ', 'T')).toLocaleString('pt-BR')} · {t.by} · prioridade {t.priority} · {t.source === 'ia' ? 'aberta pelo assistente' : 'aberta pelo formulário'}</small><small className="p-ticket-desc">{t.description}</small></span>
+            <span className={`p-tag ${t.crm === 'enviado' ? 'p-tag--ok' : ''}`}>{t.crm === 'enviado' ? 'No CRM' : t.crm === 'erro' ? 'Falhou' : 'Só no painel'}</span>
+            {t.crm !== 'enviado' && cfg.webhookUrl ? <button type="button" className="p-btn p-btn--ghost" onClick={() => reenviar(t.id)}>Reenviar</button> : null}
+          </div>
+        )) : <p className="p-empty">Nenhuma demanda ainda.</p>}
+      </div>
     </>
   );
 }

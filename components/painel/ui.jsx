@@ -13,6 +13,7 @@ const PATHS = {
   arrow: 'M5 12h14M13 6l6 6-6 6',
   back: 'M19 12H5M11 6l-6 6 6 6',
   chevron: 'M6 9l6 6 6-6',
+  chat: 'M21 12a8.5 8.5 0 0 1-12.6 7.4L3 21l1.7-5.2A8.5 8.5 0 1 1 21 12z',
 };
 export function Ico({ name, size = 18 }) {
   return <svg className="p-ico" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d={PATHS[name]} /></svg>;

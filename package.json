@@ -11,6 +11,7 @@
     "start": "next start"
   },
   "dependencies": {
+    "@anthropic-ai/sdk": "^1.8.0",
     "entities": "^6.0.0",
     "mysql2": "^3.24.6",
     "next": "^15.5.0",
