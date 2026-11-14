@@ -10,14 +10,17 @@ export const metadata = {
 
 export default async function TrabalheConosco() {
   const { paginas: p, contatos } = await getContent();
-  const mapa = `https://www.google.com/maps?q=${encodeURIComponent(p.mapaBusca)}`;
+  // O mapa mostra só o ponto da unidade (endereço ou coordenadas), nunca uma rota.
+  // A busca antiga pelo nome da marca levava o Google a um resultado errado; quem ainda a tem salva passa a usar o endereço.
+  const local = !p.mapaBusca || p.mapaBusca === 'Argaforte BR-364 Km 233 Cacoal RO' ? 'BR-364, Km 233 - Setor Prosperidade, Cacoal - RO, 78975-000' : p.mapaBusca;
+  const mapa = `https://maps.google.com/maps?q=${encodeURIComponent(local)}&t=m&z=14`;
   const tel = contatos.telefone.replace(/\D/g, '');
   return (
     <>
       <PageHero title="Trabalhe conosco" image={p.trabalheCapa} edit="paginas:trabalhe" />
       <section className="trabalhe" data-edit="paginas:trabalhe">
         <div className="container">
-          <iframe className="trabalhe-mapa" title="Mapa da unidade industrial do Grupo Forte" src={`${mapa}&output=embed`} loading="lazy" referrerPolicy="no-referrer-when-downgrade" />
+          <iframe className="trabalhe-mapa" title="Mapa da unidade industrial do Grupo Forte" src={`${mapa}&output=embed&iwloc=near`} loading="lazy" referrerPolicy="no-referrer-when-downgrade" />
           <article className="unidade-card" data-reveal>
             {p.unidadeFoto ? <img src={p.unidadeFoto} alt="Fachada da unidade industrial" width="176" height="176" loading="lazy" /> : null}
             <div className="unidade-card-body">
