@@ -1,7 +1,7 @@
 import Anthropic from '@anthropic-ai/sdk';
 import { body, fail, guard, json } from '@/lib/api';
 import { loginAllowed, loginFailed } from '@/lib/auth';
-import { supportChat } from '@/lib/support';
+import { AiError, supportChat } from '@/lib/support';
 
 export const maxDuration = 120;
 
@@ -22,6 +22,12 @@ export async function POST(req) {
   try { return json(await supportChat(g.user, history, String(tela || '').slice(0, 60))); }
   catch (e) {
     if (e.code === 'AI_OFF') return fail(e.message, 409);
+    if (e instanceof AiError) {
+      console.error('Suporte IA:', e.status, e.message);
+      if (g.user.admin) return fail(`A IA recusou o pedido (${e.status || 'sem resposta'}): ${e.message}. Confira a chave e o modelo em Suporte (IA e CRM).`, 502);
+      return fail(e.status === 401 || e.status === 403 ? 'A chave da IA foi recusada. Avise o administrador.' : e.status === 429 ? 'O assistente está ocupado. Tente de novo em instantes.' : 'O assistente não respondeu. Tente de novo ou abra uma demanda.', e.status === 429 ? 503 : 502);
+    }
+    if (e instanceof Anthropic.APIError && !(e instanceof Anthropic.APIConnectionError) && g.user.admin) { console.error('Suporte IA:', e.status, e.message); return fail(`A IA recusou o pedido (${e.status}): ${String(e.message).slice(0, 300)}. Confira a chave e o modelo em Suporte (IA e CRM).`, 502); }
     if (e instanceof Anthropic.AuthenticationError || e instanceof Anthropic.PermissionDeniedError) return fail('A chave da IA foi recusada. Avise o administrador.', 502);
     if (e instanceof Anthropic.RateLimitError) return fail('O assistente está ocupado. Tente de novo em instantes.', 503);
     if (e instanceof Anthropic.APIConnectionError) return fail('Não foi possível falar com o assistente. Tente de novo.', 503);
