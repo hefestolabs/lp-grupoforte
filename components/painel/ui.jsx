@@ -25,10 +25,54 @@ export function Avatar({ name, size = 40, tone = 'navy' }) {
 }
 export const roleName = (u) => (u.admin ? 'Administrador' : 'Editor');
 
+// Mantém o elemento montado durante a animação de saída. Devolve [montado, visível].
+export function usePresence(open, ms = 160) {
+  const [mounted, setMounted] = useState(open);
+  const [shown, setShown] = useState(false);
+  useEffect(() => {
+    if (open) { setMounted(true); let b = 0; const a = requestAnimationFrame(() => { b = requestAnimationFrame(() => setShown(true)); }); return () => { cancelAnimationFrame(a); cancelAnimationFrame(b); }; }
+    setShown(false); const t = setTimeout(() => setMounted(false), ms); return () => clearTimeout(t);
+  }, [open]);
+  return [mounted, shown];
+}
+
+// Imagem com lazy loading: o fundo fica como skeleton até ela carregar e então aparece com fade.
+export function Img({ src, alt = '' }) {
+  const ref = useRef(null);
+  const [ok, setOk] = useState(false);
+  useEffect(() => { setOk(Boolean(ref.current?.complete && ref.current.naturalWidth)); }, [src]);
+  return <img ref={ref} src={src} alt={alt} loading="lazy" decoding="async" className={`p-img ${ok ? 'is-loaded' : ''}`} onLoad={() => setOk(true)} onError={() => setOk(true)} />;
+}
+
+// Barra fina no topo enquanto há chamadas ao servidor (só aparece se demorar mais de 150 ms).
+export function NetBar() {
+  const [on, setOn] = useState(false);
+  useEffect(() => {
+    let t = 0;
+    const h = (e) => { clearTimeout(t); if (e.detail > 0) t = setTimeout(() => setOn(true), 150); else setOn(false); };
+    window.addEventListener('gf-net', h); return () => { clearTimeout(t); window.removeEventListener('gf-net', h); };
+  }, []);
+  return <div className={`p-netbar ${on ? 'is-on' : ''}`} role="progressbar" aria-label="Carregando" aria-hidden={!on}><i /></div>;
+}
+
+// Aviso (toast) com entrada e saída.
+export function Toast({ toast, open }) {
+  const [mounted, shown] = usePresence(open && Boolean(toast), 180);
+  if (!mounted || !toast) return null;
+  return <div className={`p-toast p-toast--${toast.kind}`} data-shown={shown} role="status">{toast.text}</div>;
+}
+
+// Barra de progresso determinada (valor de 0 a 1).
+export function Progress({ value, label }) {
+  const pct = Math.round(Math.min(1, Math.max(0, value)) * 100);
+  return <div className="p-progress" role="progressbar" aria-valuemin={0} aria-valuemax={100} aria-valuenow={pct} aria-label={label}><i style={{ transform: `scaleX(${pct / 100})` }} /></div>;
+}
+
 // Círculo de perfil com menu: mostra quem está usando o gerenciador.
 export function ProfileMenu({ user, items, onLogout, dark = false }) {
   const [open, setOpen] = useState(false);
   const ref = useRef(null);
+  const [mounted, shown] = usePresence(open, 140);
   useEffect(() => {
     if (!open) return;
     const away = (e) => { if (!ref.current?.contains(e.target)) setOpen(false); };
@@ -43,8 +87,8 @@ export function ProfileMenu({ user, items, onLogout, dark = false }) {
         <span className="p-profile-who"><b>{user.name}</b><small>{roleName(user)}</small></span>
         <Ico name="chevron" size={16} />
       </button>
-      {open ? (
-        <div className="p-profile-menu" role="menu">
+      {mounted ? (
+        <div className="p-profile-menu" role="menu" data-shown={shown}>
           <div className="p-profile-head">
             <Avatar name={user.name} size={46} />
             <div><b>{user.name}</b><small>{user.email || user.username}</small><span className={`p-badge ${user.admin ? 'p-badge--admin' : ''}`}>{roleName(user)}</span></div>

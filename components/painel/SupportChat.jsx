@@ -1,6 +1,8 @@
 'use client';
 import { useEffect, useRef, useState } from 'react';
 import { api } from './api';
+import { usePresence } from './ui';
+import { RowsSkeleton } from './Skeleton';
 
 const OLA = 'Olá! Sou o assistente do painel. Posso tirar dúvidas de uso e, se for algo maior, abro uma demanda para a equipe. Como posso ajudar?';
 const SUGESTOES = ['Como publico uma notícia?', 'Mudei um texto e não apareceu no site', 'Como troco uma imagem?'];
@@ -24,7 +26,8 @@ export default function SupportChat({ user, screen, admin, goSettings }) {
   useEffect(() => { if (open && !status) load(); }, [open]);
   useEffect(() => { if (status && !status.ai && mode === 'chat') setMode('form'); }, [status]);
   useEffect(() => { end.current?.scrollIntoView({ block: 'end' }); }, [msgs, busy, mode]);
-  useEffect(() => { if (open) setTimeout(() => input.current?.focus(), 50); }, [open, mode]);
+  // Foca o campo principal ao abrir ou trocar de aba, sem tirar o cursor de um campo que a pessoa já está usando.
+  useEffect(() => { if (!open) return; const t = setTimeout(() => { if (!document.activeElement?.closest?.('.sc-panel input, .sc-panel textarea, .sc-panel select')) input.current?.focus(); }, 50); return () => clearTimeout(t); }, [open, mode]);
   useEffect(() => { if (!open) return; const esc = (e) => { if (e.key === 'Escape') setOpen(false); }; document.addEventListener('keydown', esc); return () => document.removeEventListener('keydown', esc); }, [open]);
 
   async function send(value) {
@@ -50,11 +53,12 @@ export default function SupportChat({ user, screen, admin, goSettings }) {
   }
   const key = (e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); send(); } };
   const mine = status?.tickets || [];
+  const [mounted, shown] = usePresence(open, 160);
 
   return (
     <div className="sc">
-      {open ? (
-        <section className="sc-panel" role="dialog" aria-label="Suporte do painel">
+      {mounted ? (
+        <section className="sc-panel" data-shown={shown} role="dialog" aria-label="Suporte do painel">
           <header className="sc-head">
             <span className="sc-dot" aria-hidden="true" />
             <div><b>Suporte</b><small>{status?.ai ? 'Assistente com IA · Hefesto Labs' : 'Hefesto Labs'}</small></div>
@@ -93,14 +97,14 @@ export default function SupportChat({ user, screen, admin, goSettings }) {
               <label>O que aconteceu?<textarea rows={5} value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} placeholder="O que você tentou fazer, em que tela e o que apareceu." maxLength={4000} required /></label>
               <label>Urgência<select value={form.priority} onChange={(e) => setForm({ ...form, priority: e.target.value })}><option value="baixa">Baixa — melhoria ou sugestão</option><option value="normal">Normal</option><option value="alta">Alta — algo importante não funciona</option><option value="urgente">Urgente — site fora do ar</option></select></label>
               {error ? <p className="sc-error" role="alert">{error}</p> : null}
-              <button className="p-btn p-btn--primary" disabled={busy}>{busy ? 'Enviando…' : sent ? 'Enviar outra demanda' : 'Enviar demanda'}</button>
+              <button className="p-btn p-btn--primary" disabled={busy} data-busy={busy || undefined}>{busy ? 'Enviando…' : sent ? 'Enviar outra demanda' : 'Enviar demanda'}</button>
               <span ref={end} />
             </form>
           ) : null}
 
           {mode === 'list' ? (
             <div className="sc-body sc-list">
-              {mine.length ? mine.map((t) => (
+              {!status ? <RowsSkeleton rows={3} /> : mine.length ? mine.map((t) => (
                 <div className="sc-item" key={t.id}>
                   <b>#{t.id} · {t.title}</b>
                   <small>{new Date(String(t.at).replace(' ', 'T')).toLocaleDateString('pt-BR')}{admin ? ` · ${t.by}` : ''} · prioridade {t.priority}</small>
