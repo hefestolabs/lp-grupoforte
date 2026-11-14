@@ -1,25 +1,28 @@
 'use client';
 import { useRef, useState } from 'react';
 import { upload } from './api';
+import { Img, Progress } from './ui';
 
 function ImageField({ value, onChange }) {
   const input = useRef(null);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
+  const [pct, setPct] = useState(0);
   async function pick(e) {
     const file = e.target.files?.[0]; e.target.value = '';
     if (!file) return;
-    setBusy(true); setError('');
-    try { onChange(await upload(file)); } catch (err) { setError(err.message); }
+    setBusy(true); setError(''); setPct(0);
+    try { onChange(await upload(file, setPct)); } catch (err) { setError(err.message); }
     setBusy(false);
   }
   return (
     <div className="p-image">
-      <div className="p-image-thumb">{value ? <img src={value} alt="" /> : <span>Sem imagem</span>}</div>
+      <div className="p-image-thumb">{value ? <Img src={value} /> : <span>Sem imagem</span>}</div>
       <div className="p-image-actions">
         <input ref={input} type="file" accept="image/jpeg,image/png,image/webp,image/gif" hidden onChange={pick} />
-        <button type="button" className="p-btn" disabled={busy} onClick={() => input.current.click()}>{busy ? 'Enviando…' : value ? 'Trocar imagem' : 'Enviar imagem'}</button>
+        <button type="button" className="p-btn" disabled={busy} data-busy={busy || undefined} onClick={() => input.current.click()}>{busy ? `Enviando… ${Math.round(pct * 100)}%` : value ? 'Trocar imagem' : 'Enviar imagem'}</button>
         {value ? <button type="button" className="p-btn p-btn--ghost" onClick={() => onChange('')}>Remover</button> : null}
+        {busy ? <Progress value={pct} label="Envio da imagem" /> : null}
         {error ? <p className="p-error" role="alert">{error}</p> : null}
       </div>
     </div>
@@ -37,7 +40,7 @@ function ListField({ field, value, onChange }) {
         <div className={`p-list-item ${open === i ? 'is-open' : ''}`} key={i}>
           <div className="p-list-head">
             <button type="button" className="p-list-title" aria-expanded={open === i} onClick={() => setOpen(open === i ? -1 : i)}>
-              {item.img ? <img src={item.img} alt="" /> : null}
+              {item.img ? <Img src={item.img} /> : null}
               <span>{item[field.rotulo] || `${field.nomeItem} ${i + 1}`}</span>
             </button>
             <button type="button" className="p-icon-btn" aria-label="Subir" disabled={i === 0} onClick={() => move(i, -1)}>↑</button>

@@ -44,7 +44,7 @@ export default function AuthForm({ mode, u, t }) {
             {newPw ? <p className="p-help">Pelo menos 10 caracteres, com letras e números.</p> : null}
             {mode === 'login' ? <a className="p-auth-forgot" href="/painel/recuperar/">Esqueci a senha</a> : null}
             {error ? <p className="p-error" role="alert">{error}</p> : null}
-            <button className="p-btn p-btn--primary" disabled={busy}>{busy ? 'Aguarde…' : button}</button>
+            <button className="p-btn p-btn--primary" disabled={busy} data-busy={busy || undefined}>{busy ? 'Aguarde…' : button}</button>
             {mode === 'recover' || mode === 'reset' ? <a className="p-auth-link" href="/painel/login/">Voltar para o login</a> : null}
           </>
         )}

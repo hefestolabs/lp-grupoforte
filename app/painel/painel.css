@@ -441,3 +441,77 @@
 .p-ticket-desc { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; white-space: normal; }
 @media (max-width: 520px) { .sc { right: 12px; bottom: 12px; } .sc-panel { width: calc(100vw - 24px); height: calc(100vh - 96px); height: calc(100dvh - 96px); } .sc-fab { width: 52px; height: 52px; } }
 @media (prefers-reduced-motion: reduce) { .sc-typing i { animation: none; } }
+
+/* ---------- Movimento, carregamento e progresso ----------
+   Painel é ferramenta de trabalho: movimento curto (até 300 ms), só transform/opacity, curva própria,
+   saída mais discreta que a entrada. Tudo é desligado com prefers-reduced-motion (fim do arquivo). */
+.painel { --p-ease: cubic-bezier(0.22, 1, 0.36, 1); --p-ease-in: cubic-bezier(0.4, 0, 1, 1); }
+
+/* Skeleton */
+.sk { display: block; background: linear-gradient(90deg, #e3e8ee 25%, #f1f4f7 45%, #e3e8ee 65%) 0 0 / 300% 100%; animation: sk-shimmer 1.4s linear infinite; }
+@keyframes sk-shimmer { from { background-position: 100% 0; } to { background-position: 0 0; } }
+.sk-card { display: flex; flex-direction: column; gap: 18px; padding: 24px; }
+.sk-field { display: flex; flex-direction: column; gap: 8px; }
+.sk-rows { display: flex; flex-direction: column; gap: 14px; padding: 16px; }
+.sk-row { display: flex; align-items: center; gap: 12px; }
+.sk-row > span:last-child { flex: 1; display: flex; flex-direction: column; gap: 8px; }
+.sk-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 16px; margin: 28px 0; }
+.sk-shell .p-side nav { display: flex; flex-direction: column; gap: 10px; }
+.sk-editor { display: flex; flex-direction: column; height: 100vh; height: 100dvh; background: #dfe4ea; }
+.sk-editor-bar { flex: none; height: 56px; background: var(--p-navy); }
+.sk-editor-body { flex: 1; display: flex; min-height: 0; }
+.sk-editor-side { flex: none; display: flex; flex-direction: column; gap: 10px; width: 340px; padding: 16px; background: #fff; }
+.sk-editor-main { flex: 1; padding: 20px; }
+.sk-preview { display: flex; flex-direction: column; gap: 14px; height: 100%; border-radius: 10px; overflow: hidden; background: #fff; }
+.sk-preview > .sk:nth-child(n+4) { margin-left: 24px; }
+.sk-preview-cols { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; padding: 0 24px; }
+@media (max-width: 900px) { .sk-editor-side { display: none; } }
+.ed-frame { position: relative; }
+.ed-skel { position: absolute; inset: 0; z-index: 2; background: #fff; transition: opacity 0.2s var(--p-ease-in); }
+.ed-skel.is-out { opacity: 0; pointer-events: none; }
+/* Prévia sendo atualizada: barra fina no topo do quadro */
+.ed-frame[data-busy]::before { content: ''; position: absolute; top: 0; left: 0; z-index: 3; width: 40%; height: 3px; background: var(--p-orange); animation: p-slide 1s var(--p-ease) infinite; }
+@keyframes p-slide { from { transform: translateX(-100%); } to { transform: translateX(250%); } }
+
+/* Imagens: fundo de skeleton até carregar, depois fade */
+.p-img { opacity: 0; transition: opacity 0.25s var(--p-ease); }
+.p-img.is-loaded { opacity: 1; }
+
+/* Barra do topo: chamadas ao servidor */
+.p-netbar { position: fixed; top: 0; left: 0; right: 0; z-index: 90; height: 3px; overflow: hidden; pointer-events: none; opacity: 0; transition: opacity 0.2s var(--p-ease-in); }
+.p-netbar.is-on { opacity: 1; transition-duration: 0.1s; }
+.p-netbar i { display: block; width: 35%; height: 100%; background: var(--p-orange); }
+.p-netbar.is-on i { animation: p-slide 1.1s var(--p-ease) infinite; }
+
+/* Progresso determinado (envio de imagem) */
+.p-progress { width: 100%; height: 6px; border-radius: 99px; overflow: hidden; background: #dfe4ea; }
+.p-progress i { display: block; height: 100%; background: var(--p-orange); transform-origin: left; transition: transform 0.2s linear; }
+
+/* Botões: toque e carregamento */
+.p-btn, .ed-btn { transition: background-color 0.15s, border-color 0.15s, transform 0.12s var(--p-ease); }
+.p-btn:active:not(:disabled), .ed-btn:active:not(:disabled) { transform: scale(0.97); }
+.p-btn[data-busy], .ed-btn[data-busy] { opacity: 0.8; }
+.p-btn[data-busy]::before, .ed-btn[data-busy]::before { content: ''; flex: none; width: 14px; height: 14px; margin-right: 8px; border: 2px solid currentColor; border-right-color: transparent; border-radius: 50%; animation: p-spin 0.7s linear infinite; }
+@keyframes p-spin { to { transform: rotate(360deg); } }
+
+/* Troca de tela: uma entrada curta para a tela inteira (sem animar item por item) */
+.p-screen { animation: p-enter 0.2s var(--p-ease) both; }
+@keyframes p-enter { from { opacity: 0; transform: translateY(6px); } }
+
+/* Menus e avisos: transição com estado (pode ser interrompida) e origem no gatilho */
+.p-profile-menu { transform-origin: top right; opacity: 0; transform: scale(0.96) translateY(-4px); transition: opacity 0.14s var(--p-ease-in), transform 0.14s var(--p-ease-in); }
+.p-profile-menu[data-shown='true'] { opacity: 1; transform: none; transition: opacity 0.18s var(--p-ease), transform 0.18s var(--p-ease); }
+.p-toast { opacity: 0; transform: translateX(-50%) translateY(6px); transition: opacity 0.18s var(--p-ease-in), transform 0.18s var(--p-ease-in); }
+.p-toast[data-shown='true'] { opacity: 1; transform: translateX(-50%); transition: opacity 0.24s var(--p-ease), transform 0.24s var(--p-ease); }
+.sc-panel { transform-origin: bottom right; opacity: 0; transform: scale(0.96) translateY(8px); transition: opacity 0.16s var(--p-ease-in), transform 0.16s var(--p-ease-in); }
+.sc-panel[data-shown='true'] { opacity: 1; transform: none; transition: opacity 0.22s var(--p-ease), transform 0.22s var(--p-ease); }
+.sc-msg { animation: p-enter 0.18s var(--p-ease) both; }
+.sc-fab { animation: p-enter 0.25s var(--p-ease) both; transition: transform 0.12s var(--p-ease); }
+.sc-fab:active { transform: scale(0.95); }
+
+@media (prefers-reduced-motion: reduce) {
+  .painel *, .painel *::before, .painel *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; scroll-behavior: auto !important; }
+  .sk { animation: none; background: #e3e8ee; }
+  .ed-frame[data-busy]::before, .p-netbar.is-on i { animation: none; width: 100%; opacity: 0.6; }
+  .p-btn[data-busy]::before, .ed-btn[data-busy]::before { animation: none; border-right-color: currentColor; opacity: 0.5; }
+}

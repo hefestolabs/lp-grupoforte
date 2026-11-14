@@ -62,7 +62,7 @@ export default function SpeedTest() {
     <section className="d-card d-span3 d-speed">
       <div className="d-card-head">
         <h2>Velocidade do site</h2>
-        <button type="button" className="p-btn p-btn--primary" disabled={Boolean(running)} onClick={testar}>{running ? 'Testando…' : rows.length ? 'Testar de novo' : 'Testar a velocidade'}</button>
+        <button type="button" className="p-btn p-btn--primary" disabled={Boolean(running)} data-busy={running ? true : undefined} onClick={testar}>{running ? 'Testando…' : rows.length ? 'Testar de novo' : 'Testar a velocidade'}</button>
       </div>
       <div ref={holder} />
       {!rows.length && !running ? <p className="d-empty">Abre cada página do site neste navegador e mede quanto tempo leva para carregar por completo. Leva cerca de meio minuto.</p> : null}

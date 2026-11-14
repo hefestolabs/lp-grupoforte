@@ -1,11 +1,15 @@
 'use client';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { api } from './api';
 import { Field } from './Fields';
-import Editor from './Editor';
+import dynamic from 'next/dynamic';
 import Dashboard from './Dashboard';
-import SupportChat from './SupportChat';
-import { Avatar, Ico, ProfileMenu, roleName } from './ui';
+import { Avatar, Ico, Img, NetBar, ProfileMenu, Toast, roleName } from './ui';
+import { CardSkeleton, EditorSkeleton, RowsSkeleton } from './Skeleton';
+
+// Partes pesadas são baixadas só quando usadas.
+const Editor = dynamic(() => import('./Editor'), { ssr: false, loading: () => <EditorSkeleton /> });
+const SupportChat = dynamic(() => import('./SupportChat'), { ssr: false });
 
 const hoje = () => new Date().toISOString().slice(0, 10);
 
@@ -18,6 +22,8 @@ export default function PainelApp({ storeMode, user, schema, initialContent, ini
   const [posts, setPosts] = useState(initialPosts);
   const [users, setUsers] = useState(initialUsers);
   const [toast, setToast] = useState(null);
+  const [toastOn, setToastOn] = useState(false);
+  const toastTimer = useRef(0);
   const [busy, setBusy] = useState(false);
   const [menu, setMenu] = useState(false);
   const [startNew, setStartNew] = useState(0); // abre Notícias já no formulário de nova notícia
@@ -25,7 +31,7 @@ export default function PainelApp({ storeMode, user, schema, initialContent, ini
 
   const section = schema.find((s) => s.id === tab);
   const dirty = section ? JSON.stringify(content[tab]) !== JSON.stringify(saved[tab]) : false;
-  const notify = (text, kind = 'ok') => { setToast({ text, kind }); setTimeout(() => setToast(null), 4000); };
+  const notify = (text, kind = 'ok') => { setToast({ text, kind }); setToastOn(true); clearTimeout(toastTimer.current); toastTimer.current = setTimeout(() => setToastOn(false), 4000); };
 
   // Avisa antes de sair com alterações não salvas.
   useEffect(() => {
@@ -60,9 +66,10 @@ export default function PainelApp({ storeMode, user, schema, initialContent, ini
   if (tab === 'editor') {
     return (
       <>
+        <NetBar />
         <Editor schema={schema} content={content} setContent={setContent} saved={saved} setSaved={setSaved} notify={notify} user={user} goTab={open} logout={logout} startPage={editorPage} />
         {storeMode !== 'mysql' ? <p className="p-error p-aviso ed-aviso" role="alert">Atenção: o banco de dados não está conectado. As alterações se perdem na próxima publicação do site.</p> : null}
-        {toast ? <div className={`p-toast p-toast--${toast.kind}`} role="status">{toast.text}</div> : null}
+        <Toast toast={toast} open={toastOn} />
         {chat}
       </>
     );
@@ -70,6 +77,7 @@ export default function PainelApp({ storeMode, user, schema, initialContent, ini
 
   return (
     <div className="p-app">
+      <NetBar />
       <aside className={`p-side ${menu ? 'is-open' : ''}`}>
         <div className="p-side-top">
           <img src="/img/logo-branco.png" alt="Grupo Forte" width="150" height="43" />
@@ -94,6 +102,7 @@ export default function PainelApp({ storeMode, user, schema, initialContent, ini
         </header>
       <main className={`p-main ${tab === 'inicio' ? 'p-main--wide' : ''}`}>
         {storeMode !== 'mysql' ? <p className="p-error p-aviso" role="alert">Atenção: o banco de dados não está conectado. As alterações ficam em um arquivo temporário e se perdem na próxima publicação do site. Avise o suporte.</p> : null}
+        <div className="p-screen" key={tab}>
         {tab === 'inicio' ? <Dashboard user={user} posts={posts} users={users} go={open} openPost={(p) => { setOpenPostId(p.id); setStartNew(0); setTab('noticias'); window.scrollTo(0, 0); }} /> : null}
 
         {section ? (
@@ -110,7 +119,7 @@ export default function PainelApp({ storeMode, user, schema, initialContent, ini
             <div className={`p-savebar ${dirty ? 'is-dirty' : ''}`}>
               <span>{dirty ? 'Há alterações não salvas.' : 'Tudo salvo.'}</span>
               {dirty ? <button type="button" className="p-btn p-btn--ghost" onClick={() => setContent({ ...content, [tab]: saved[tab] })}>Descartar</button> : null}
-              <button type="button" className="p-btn p-btn--primary" disabled={!dirty || busy} onClick={saveSection}>{busy ? 'Salvando…' : 'Salvar alterações'}</button>
+              <button type="button" className="p-btn p-btn--primary" disabled={!dirty || busy} data-busy={busy || undefined} onClick={saveSection}>{busy ? 'Salvando…' : 'Salvar alterações'}</button>
             </div>
           </>
         ) : null}
@@ -120,10 +129,11 @@ export default function PainelApp({ storeMode, user, schema, initialContent, ini
         {user.admin && tab === 'email' ? <Email me={user} notify={notify} go={go} /> : null}
         {user.admin && tab === 'suporte' ? <Suporte notify={notify} /> : null}
         {tab === 'senha' ? <Conta me={user} locked={locked} notify={notify} /> : null}
+        </div>
       </main>
       </div>
 
-      {toast ? <div className={`p-toast p-toast--${toast.kind}`} role="status">{toast.text}</div> : null}
+      <Toast toast={toast} open={toastOn} />
       {chat}
     </div>
   );
@@ -203,7 +213,7 @@ function Noticias({ posts, setPosts, notify, startNew, openId }) {
         </div>
         <div className="p-savebar is-dirty">
           {edit.id ? <button type="button" className="p-btn p-btn--danger" disabled={busy} onClick={excluir}>Excluir</button> : <span />}
-          <button type="button" className="p-btn p-btn--primary" disabled={busy} onClick={salvar}>{busy ? 'Salvando…' : edit.status === 'publicado' ? (edit.id ? 'Atualizar notícia' : 'Publicar notícia') : 'Salvar rascunho'}</button>
+          <button type="button" className="p-btn p-btn--primary" disabled={busy} data-busy={busy || undefined} onClick={salvar}>{busy ? 'Salvando…' : edit.status === 'publicado' ? (edit.id ? 'Atualizar notícia' : 'Publicar notícia') : 'Salvar rascunho'}</button>
         </div>
       </>
     );
@@ -214,7 +224,7 @@ function Noticias({ posts, setPosts, notify, startNew, openId }) {
       <div className="p-card p-card--open">
         {posts.length ? posts.map((p) => (
           <button type="button" className="p-row" key={p.id} onClick={() => abrir(p)}>
-            <span className="p-row-thumb">{p.image ? <img src={p.image.src} alt="" /> : null}</span>
+            <span className="p-row-thumb">{p.image ? <Img src={p.image.src} /> : null}</span>
             <span className="p-row-main"><b>{p.title}</b><small>{new Date(p.date).toLocaleDateString('pt-BR')}{p.categories[0] ? ` · ${p.categories[0].name}` : ''}</small></span>
             <span className={`p-tag ${p.status === 'publicado' ? 'p-tag--ok' : ''}`}>{p.status === 'publicado' ? 'Publicada' : 'Rascunho'}</span>
           </button>
@@ -263,7 +273,7 @@ function Acessos({ users, setUsers, me, notify, go }) {
               <p className="p-help">Para convidar por e-mail em vez de combinar uma senha, <button type="button" className="p-linklike" onClick={() => go('email')}>configure o envio de e-mails</button>.</p>
             </>
           )}
-          <button className="p-btn p-btn--primary" disabled={busy}>{busy ? 'Criando…' : mail?.ready ? 'Criar acesso e enviar convite' : 'Criar acesso'}</button>
+          <button className="p-btn p-btn--primary" disabled={busy} data-busy={busy || undefined}>{busy ? 'Criando…' : mail?.ready ? 'Criar acesso e enviar convite' : 'Criar acesso'}</button>
         </div>
       </form>
     </>
@@ -289,7 +299,7 @@ function Email({ me, notify, go }) {
     try { const out = await api('mail-test', { method: 'POST' }); notify(`E-mail de teste enviado para ${out.to}.`); } catch (err) { notify(err.message, 'erro'); }
     setBusy(false);
   }
-  if (!cfg) return <header className="p-head"><h1>E-mail (Resend)</h1><p className="p-muted">Carregando…</p></header>;
+  if (!cfg) return <><header className="p-head"><h1>E-mail (Resend)</h1><p className="p-muted">Configura o envio de e-mails do painel.</p></header><CardSkeleton fields={3} /></>;
   return (
     <>
       <header className="p-head"><h1>E-mail (Resend)</h1><p className="p-muted">Usado para recuperar senha e convidar novos acessos.</p></header>
@@ -303,7 +313,7 @@ function Email({ me, notify, go }) {
           </div>
           <div className="p-field"><label>Remetente<input value={f.from} onChange={(e) => setF({ ...f, from: e.target.value })} placeholder="Grupo Forte <painel@seudominio.com.br>" spellCheck={false} /></label><p className="p-help">O domínio do endereço precisa estar verificado no Resend (resend.com → Domains).</p></div>
           <div className="p-field"><label>Endereço do site<input value={f.siteUrl} onChange={(e) => setF({ ...f, siteUrl: e.target.value })} spellCheck={false} /></label><p className="p-help">Usado nos links dos e-mails. Atualize quando o site ganhar o domínio definitivo.</p></div>
-          <button className="p-btn p-btn--primary" disabled={busy}>{busy ? 'Salvando…' : 'Salvar'}</button>
+          <button className="p-btn p-btn--primary" disabled={busy} data-busy={busy || undefined}>{busy ? 'Salvando…' : 'Salvar'}</button>
         </div>
       </form>
       <div className="p-card p-card--open"><div className="p-card-body">
@@ -351,7 +361,7 @@ function Conta({ me, locked, notify }) {
           <div className="p-field"><label>Senha atual<input type="password" value={f.current} onChange={(e) => setF({ ...f, current: e.target.value })} autoComplete="current-password" required /></label></div>
           <div className="p-field"><label>Nova senha<input type="password" value={f.next} onChange={(e) => setF({ ...f, next: e.target.value })} autoComplete="new-password" required /></label><p className="p-help">Pelo menos 10 caracteres, com letras e números.</p></div>
           <div className="p-field"><label>Repita a nova senha<input type="password" value={f.confirm} onChange={(e) => setF({ ...f, confirm: e.target.value })} autoComplete="new-password" required /></label></div>
-          <button className="p-btn p-btn--primary" disabled={busy}>{busy ? 'Salvando…' : 'Trocar senha'}</button>
+          <button className="p-btn p-btn--primary" disabled={busy} data-busy={busy || undefined}>{busy ? 'Salvando…' : 'Trocar senha'}</button>
         </div>
       </form>
     </>
@@ -382,7 +392,7 @@ function Suporte({ notify }) {
   async function reenviar(id) {
     try { const out = await api('support/tickets', { method: 'POST', data: { id } }); notify(out.crm === 'enviado' ? `Demanda #${id} enviada ao CRM.` : `Não foi enviada: ${out.detail}`, out.crm === 'enviado' ? 'ok' : 'erro'); loadTickets(); } catch (err) { notify(err.message, 'erro'); }
   }
-  if (!cfg) return <header className="p-head"><h1>Suporte (IA e CRM)</h1><p className="p-muted">Carregando…</p></header>;
+  if (!cfg) return <><header className="p-head"><h1>Suporte (IA e CRM)</h1><p className="p-muted">Configura o chat de suporte do canto inferior direito. Só você, administrador, vê esta tela.</p></header><CardSkeleton fields={4} /><div className="p-card p-card--open"><RowsSkeleton rows={3} /></div></>;
   return (
     <>
       <header className="p-head"><h1>Suporte (IA e CRM)</h1><p className="p-muted">Configura o chat de suporte do canto inferior direito. Só você, administrador, vê esta tela.</p></header>
@@ -410,7 +420,7 @@ function Suporte({ notify }) {
             <label>Segredo do webhook (opcional)<input type="password" value={f.webhookSecret} onChange={(e) => setF({ ...f, webhookSecret: e.target.value })} autoComplete="off" spellCheck={false} placeholder={cfg.hasSecret ? 'Segredo salvo. Deixe vazio para manter.' : 'Enviado no cabeçalho X-Webhook-Secret'} /></label>
             {cfg.hasSecret ? <button type="button" className="p-btn p-btn--danger" onClick={() => remover('removeSecret')}>Remover o segredo</button> : null}
           </div>
-          <div className="p-row-actions"><button className="p-btn p-btn--primary" disabled={busy}>{busy ? 'Salvando…' : 'Salvar'}</button><button type="button" className="p-btn" disabled={busy || !cfg.webhookUrl} onClick={testar}>Enviar demanda de teste ao CRM</button></div>
+          <div className="p-row-actions"><button className="p-btn p-btn--primary" disabled={busy} data-busy={busy || undefined}>{busy ? 'Salvando…' : 'Salvar'}</button><button type="button" className="p-btn" disabled={busy || !cfg.webhookUrl} onClick={testar}>Enviar demanda de teste ao CRM</button></div>
         </div>
       </form>
       <div className="p-card p-card--open">

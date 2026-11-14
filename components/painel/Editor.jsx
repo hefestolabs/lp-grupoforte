@@ -1,5 +1,6 @@
 'use client';
 import { useEffect, useMemo, useRef, useState } from 'react';
+import { PreviewSkeleton } from './Skeleton';
 import { api } from './api';
 import { Field } from './Fields';
 import { ProfileMenu } from './ui';
@@ -19,6 +20,8 @@ export default function Editor({ schema, content, setContent, saved, setSaved, n
   const [device, setDevice] = useState('desktop');
   const [busy, setBusy] = useState(false);
   const [state, setState] = useState('pronto'); // pronto | atualizando
+  const [loaded, setLoaded] = useState(false); // a prévia já apareceu ao menos uma vez nesta página
+  const [step, setStep] = useState(0); // seções já publicadas, para a barra de progresso
   const [showPreview, setShowPreview] = useState(false); // só no celular
   const frame = useRef(null);
   const box = useRef(null);
@@ -51,7 +54,7 @@ export default function Editor({ schema, content, setContent, saved, setSaved, n
     const t = setTimeout(() => { api('draft', { method: 'PUT', data: { content } }).then(reload).catch((e) => { notify(e.message, 'erro'); setState('pronto'); }); }, 700);
     return () => clearTimeout(t);
   }, [content]);
-  useEffect(() => { scrollY.current = 0; setSel(null); reload(); }, [pageId]);
+  useEffect(() => { scrollY.current = 0; setSel(null); setLoaded(false); reload(); }, [pageId]);
 
   useEffect(() => {
     const onMessage = (e) => {
@@ -59,7 +62,7 @@ export default function Editor({ schema, content, setContent, saved, setSaved, n
       if (e.data.type === 'select') { setSel(e.data.id); setShowPreview(false); }
       if (e.data.type === 'page' && pages.some((x) => x.id === e.data.id)) setPageId(e.data.id);
       if (e.data.type === 'scroll') scrollY.current = e.data.y;
-      if (e.data.type === 'ready') { setState('pronto'); post({ type: 'scroll', y: scrollY.current }); if (sel) post({ type: 'focus', id: sel, scroll: false }); }
+      if (e.data.type === 'ready') { setState('pronto'); setLoaded(true); post({ type: 'scroll', y: scrollY.current }); if (sel) post({ type: 'focus', id: sel, scroll: false }); }
     };
     window.addEventListener('message', onMessage); return () => window.removeEventListener('message', onMessage);
   }, [sel]);
@@ -75,10 +78,10 @@ export default function Editor({ schema, content, setContent, saved, setSaved, n
   const change = (section, key, value) => setContent({ ...content, [section]: { ...content[section], [key]: value } });
 
   async function publish() {
-    setBusy(true);
+    setBusy(true); setStep(0);
     try {
       const next = { ...saved };
-      for (const section of dirtySections) next[section] = (await api('content', { method: 'PUT', data: { section, data: content[section] } })).data;
+      for (const section of dirtySections) { next[section] = (await api('content', { method: 'PUT', data: { section, data: content[section] } })).data; setStep((n) => n + 1); }
       setSaved(next); setContent(next);
       notify('Publicado. O site já está atualizado.');
     } catch (e) { notify(e.message, 'erro'); }
@@ -103,7 +106,7 @@ export default function Editor({ schema, content, setContent, saved, setSaved, n
         <span className="ed-grow" />
         <span className={`ed-state ${dirty ? 'is-dirty' : ''}`}>{state === 'atualizando' ? 'Atualizando a prévia…' : dirty ? 'Alterações não publicadas' : 'Tudo publicado'}</span>
         {dirty ? <button type="button" className="ed-btn" onClick={discard}>Descartar</button> : null}
-        <button type="button" className="ed-btn ed-btn--primary" disabled={!dirty || busy} onClick={publish}>{busy ? 'Publicando…' : 'Publicar'}</button>
+        <button type="button" className="ed-btn ed-btn--primary" disabled={!dirty || busy} data-busy={busy || undefined} onClick={publish}>{busy ? `Publicando ${Math.min(step + 1, dirtySections.length || 1)}/${dirtySections.length || 1}…` : 'Publicar'}</button>
         <ProfileMenu dark user={user} onLogout={logout} items={[['Início', () => leave('inicio')], ['Notícias', () => leave('noticias')], ...(user.admin ? [['Acessos', () => leave('acessos')], ['E-mail (Resend)', () => leave('email')]] : []), ['Minha conta', () => leave('senha')]]} />
       </header>
 
@@ -141,8 +144,9 @@ export default function Editor({ schema, content, setContent, saved, setSaved, n
           {DEVICES.map(([id, label]) => <button type="button" key={id} className={device === id ? 'is-active' : ''} aria-pressed={device === id} onClick={() => setDevice(id)}>{label}</button>)}
         </div>
 
-        <div ref={box} className={`ed-frame ed-frame--${device}`} style={{ width: DEVICES.find((d) => d[0] === device)[2] }}>
-          <iframe ref={frame} title="Prévia do site" style={scale < 1 ? { width: 1440, height: `${100 / scale}%`, transform: `scale(${scale})`, transformOrigin: '0 0' } : undefined} />
+        <div ref={box} data-busy={state === 'atualizando' && loaded ? true : undefined} className={`ed-frame ed-frame--${device}`} style={{ width: DEVICES.find((d) => d[0] === device)[2] }}>
+          <iframe ref={frame} title="Prévia do site" style={scale < 1 ? { width: 1440, height: `${100 / scale}%`, transform: `scale(${scale})`, transformOrigin: '0 0' } : undefined} onLoad={(e) => { if (e.currentTarget.getAttribute('src')) setLoaded(true); }} />
+          <div className={`ed-skel ${loaded ? 'is-out' : ''}`}><PreviewSkeleton /></div>
         </div>
       </main>
     </div>

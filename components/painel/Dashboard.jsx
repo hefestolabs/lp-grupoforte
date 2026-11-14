@@ -1,7 +1,12 @@
 'use client';
 import { useMemo, useState } from 'react';
 import { Avatar, Ico, roleName } from './ui';
-import SpeedTest from './SpeedTest';
+import dynamic from 'next/dynamic';
+import { Img } from './ui';
+import { CardSkeleton } from './Skeleton';
+
+// O teste de velocidade só é baixado quando o Início aparece.
+const SpeedTest = dynamic(() => import('./SpeedTest'), { ssr: false, loading: () => <CardSkeleton fields={1} /> });
 
 const MESES = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
 const CORES = ['#003b6e', '#ee7302', '#1a7f5a', '#7a4fd1', '#c2410c', '#0e7490'];
@@ -23,7 +28,7 @@ function Ring({ pct, color, label, count }) {
 function Mini({ p, onOpen }) {
   return (
     <button type="button" className="d-mini" onClick={() => onOpen(p)}>
-      <span className="d-mini-thumb">{p.image ? <img src={p.image.src} alt="" /> : null}</span>
+      <span className="d-mini-thumb">{p.image ? <Img src={p.image.src} /> : null}</span>
       <span><b>{p.title}</b><small>{p.categories[0]?.name ? `${p.categories[0].name} · ` : ''}{new Date(p.date).toLocaleDateString('pt-BR')}</small></span>
     </button>
   );
