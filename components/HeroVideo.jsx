@@ -24,14 +24,24 @@ export default function HeroVideo({ id, start = 1 }) {
     const onMessage = (e) => {
       if (e.source !== el.contentWindow || typeof e.data !== 'string') return;
       let data;
-      try { data = JSON.parse(e.data); } catch { return; }
+      try {
+        data = JSON.parse(e.data);
+      } catch {
+        return;
+      }
       const info = data.info;
       if (!info) return;
-      if (data.event === 'onReady' || data.event === 'initialDelivery') { command('mute'); command('playVideo'); }
+      if (data.event === 'onReady' || data.event === 'initialDelivery') {
+        command('mute');
+        command('playVideo');
+      }
       if (typeof info.playerState === 'number') {
         if (info.playerState === 1) show(true);
         else if (info.playerState !== 3) show(false); // 3 = carregando um trecho: mantém como está
-        if (info.playerState === 0) { command('seekTo', [start, true]); command('playVideo'); }
+        if (info.playerState === 0) {
+          command('seekTo', [start, true]);
+          command('playVideo');
+        }
       }
       if (typeof info.currentTime === 'number' && typeof info.duration === 'number' && info.duration > 2 && info.currentTime >= info.duration - 0.6) {
         command('seekTo', [start, true]);
@@ -41,13 +51,21 @@ export default function HeroVideo({ id, start = 1 }) {
     el.addEventListener('load', listen);
     listen();
     const poll = setInterval(listen, 500);
-    return () => { window.removeEventListener('message', onMessage); el.removeEventListener('load', listen); clearInterval(poll); clearTimeout(showTimer); };
+    return () => {
+      window.removeEventListener('message', onMessage);
+      el.removeEventListener('load', listen);
+      clearInterval(poll);
+      clearTimeout(showTimer);
+    };
   }, [start]);
 
   const src = `https://www.youtube-nocookie.com/embed/${id}?autoplay=1&mute=1&controls=0&loop=1&playlist=${id}&start=${start}&playsinline=1&rel=0&modestbranding=1&disablekb=1&fs=0&iv_load_policy=3&cc_load_policy=0&enablejsapi=1`;
   return (
     <div className="hero-video" aria-hidden="true">
-      <div className="hero-poster" style={{ backgroundImage: `url(https://i.ytimg.com/vi/${id}/maxresdefault.jpg), url(https://i.ytimg.com/vi/${id}/hqdefault.jpg)` }} />
+      <div
+        className="hero-poster"
+        style={{ backgroundImage: `url(https://i.ytimg.com/vi/${id}/maxresdefault.jpg), url(https://i.ytimg.com/vi/${id}/hqdefault.jpg)` }}
+      />
       <iframe
         ref={frame}
         src={src}

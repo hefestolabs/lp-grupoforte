@@ -1,6 +1,6 @@
 'use client';
-import { useState } from 'react';
 import Link from 'next/link';
+import { useState } from 'react';
 import Icon from './Icon';
 
 export default function Header({ nav, whatsapp }) {
@@ -16,9 +16,13 @@ export default function Header({ nav, whatsapp }) {
             {nav.map((n) => (
               <li key={n.label}>
                 {n.external ? (
-                  <a href={n.href} data-page={n.page}>{n.label}</a>
+                  <a href={n.href} data-page={n.page}>
+                    {n.label}
+                  </a>
                 ) : (
-                  <Link href={n.href} data-page={n.page} onClick={() => setOpen(false)}>{n.label}</Link>
+                  <Link href={n.href} data-page={n.page} onClick={() => setOpen(false)}>
+                    {n.label}
+                  </Link>
                 )}
               </li>
             ))}

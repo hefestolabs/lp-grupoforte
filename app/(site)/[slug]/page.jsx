@@ -1,8 +1,7 @@
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import Icon from '@/components/Icon';
-import { getPost, formatDate, rich } from '@/lib/data';
-
+import { formatDate, getPost, rich } from '@/lib/data';
 
 export async function generateMetadata({ params }) {
   const { slug } = await params;
@@ -26,12 +25,23 @@ export default async function Post({ params }) {
       <div className="post-inner">
         <h1>{post.title}</h1>
         <div className="post-card-meta">
-          <span><Icon name="calendar" size={20} />{d.longa}</span>
-          {cat ? <Link href={`/category/${cat.slug}/`}><Icon name="folders" size={20} />{cat.name}</Link> : null}
+          <span>
+            <Icon name="calendar" size={20} />
+            {d.longa}
+          </span>
+          {cat ? (
+            <Link href={`/category/${cat.slug}/`}>
+              <Icon name="folders" size={20} />
+              {cat.name}
+            </Link>
+          ) : null}
         </div>
         {post.image ? <img className="post-cover" src={post.image.src} alt={post.image.alt} /> : null}
         {post.content ? <div className="post-content" dangerouslySetInnerHTML={{ __html: rich(post.content) }} /> : null}
-        <Link className="btn btn-navy" href="/noticias/"><span>Todas as notícias</span><Icon name="arrow-up-right" size={15} /></Link>
+        <Link className="btn btn-navy" href="/noticias/">
+          <span>Todas as notícias</span>
+          <Icon name="arrow-up-right" size={15} />
+        </Link>
       </div>
     </article>
   );

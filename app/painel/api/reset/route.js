@@ -8,8 +8,12 @@ export async function POST(req) {
   const key = `rst|${await clientIp()}`;
   if (!loginAllowed(key)) return fail('Muitas tentativas. Aguarde 10 minutos.', 429);
   const found = await consumePasswordToken(u, t);
-  if (!found) { loginFailed(key); return fail('Este link expirou ou já foi usado. Peça um novo.'); }
-  const problem = passwordProblem(password); if (problem) return fail(problem);
+  if (!found) {
+    loginFailed(key);
+    return fail('Este link expirou ou já foi usado. Peça um novo.');
+  }
+  const problem = passwordProblem(password);
+  if (problem) return fail(problem);
   await userSave({ ...found.user, pass_hash: hashPassword(password), must_change: false });
   await found.done();
   return json({ ok: true });

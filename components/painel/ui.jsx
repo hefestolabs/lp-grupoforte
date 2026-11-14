@@ -16,12 +16,39 @@ const PATHS = {
   chat: 'M21 12a8.5 8.5 0 0 1-12.6 7.4L3 21l1.7-5.2A8.5 8.5 0 1 1 21 12z',
 };
 export function Ico({ name, size = 18 }) {
-  return <svg className="p-ico" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d={PATHS[name]} /></svg>;
+  return (
+    <svg
+      className="p-ico"
+      width={size}
+      height={size}
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.8"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+    >
+      <path d={PATHS[name]} />
+    </svg>
+  );
 }
 
-export const initials = (name) => String(name || '?').trim().split(/\s+/).filter(Boolean).slice(0, 2).map((p) => p[0]).join('').toUpperCase();
+const initials = (name) =>
+  String(name || '?')
+    .trim()
+    .split(/\s+/)
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((p) => p[0])
+    .join('')
+    .toUpperCase();
 export function Avatar({ name, size = 40, tone = 'navy' }) {
-  return <span className={`p-avatar p-avatar--${tone}`} style={{ width: size, height: size, fontSize: Math.round(size * 0.38) }} aria-hidden="true">{initials(name)}</span>;
+  return (
+    <span className={`p-avatar p-avatar--${tone}`} style={{ width: size, height: size, fontSize: Math.round(size * 0.38) }} aria-hidden="true">
+      {initials(name)}
+    </span>
+  );
 }
 export const roleName = (u) => (u.admin ? 'Administrador' : 'Editor');
 
@@ -30,8 +57,20 @@ export function usePresence(open, ms = 160) {
   const [mounted, setMounted] = useState(open);
   const [shown, setShown] = useState(false);
   useEffect(() => {
-    if (open) { setMounted(true); let b = 0; const a = requestAnimationFrame(() => { b = requestAnimationFrame(() => setShown(true)); }); return () => { cancelAnimationFrame(a); cancelAnimationFrame(b); }; }
-    setShown(false); const t = setTimeout(() => setMounted(false), ms); return () => clearTimeout(t);
+    if (open) {
+      setMounted(true);
+      let b = 0;
+      const a = requestAnimationFrame(() => {
+        b = requestAnimationFrame(() => setShown(true));
+      });
+      return () => {
+        cancelAnimationFrame(a);
+        cancelAnimationFrame(b);
+      };
+    }
+    setShown(false);
+    const t = setTimeout(() => setMounted(false), ms);
+    return () => clearTimeout(t);
   }, [open]);
   return [mounted, shown];
 }
@@ -40,8 +79,21 @@ export function usePresence(open, ms = 160) {
 export function Img({ src, alt = '' }) {
   const ref = useRef(null);
   const [ok, setOk] = useState(false);
-  useEffect(() => { setOk(Boolean(ref.current?.complete && ref.current.naturalWidth)); }, [src]);
-  return <img ref={ref} src={src} alt={alt} loading="lazy" decoding="async" className={`p-img ${ok ? 'is-loaded' : ''}`} onLoad={() => setOk(true)} onError={() => setOk(true)} />;
+  useEffect(() => {
+    setOk(Boolean(ref.current?.complete && ref.current.naturalWidth));
+  }, [src]);
+  return (
+    <img
+      ref={ref}
+      src={src}
+      alt={alt}
+      loading="lazy"
+      decoding="async"
+      className={`p-img ${ok ? 'is-loaded' : ''}`}
+      onLoad={() => setOk(true)}
+      onError={() => setOk(true)}
+    />
+  );
 }
 
 // Barra fina no topo enquanto há chamadas ao servidor (só aparece se demorar mais de 150 ms).
@@ -49,23 +101,43 @@ export function NetBar() {
   const [on, setOn] = useState(false);
   useEffect(() => {
     let t = 0;
-    const h = (e) => { clearTimeout(t); if (e.detail > 0) t = setTimeout(() => setOn(true), 150); else setOn(false); };
-    window.addEventListener('gf-net', h); return () => { clearTimeout(t); window.removeEventListener('gf-net', h); };
+    const h = (e) => {
+      clearTimeout(t);
+      if (e.detail > 0) t = setTimeout(() => setOn(true), 150);
+      else setOn(false);
+    };
+    window.addEventListener('gf-net', h);
+    return () => {
+      clearTimeout(t);
+      window.removeEventListener('gf-net', h);
+    };
   }, []);
-  return <div className={`p-netbar ${on ? 'is-on' : ''}`} role="progressbar" aria-label="Carregando" aria-hidden={!on}><i /></div>;
+  return (
+    <div className={`p-netbar ${on ? 'is-on' : ''}`} role="progressbar" aria-label="Carregando" aria-hidden={!on}>
+      <i />
+    </div>
+  );
 }
 
 // Aviso (toast) com entrada e saída.
 export function Toast({ toast, open }) {
   const [mounted, shown] = usePresence(open && Boolean(toast), 180);
   if (!mounted || !toast) return null;
-  return <div className={`p-toast p-toast--${toast.kind}`} data-shown={shown} role="status">{toast.text}</div>;
+  return (
+    <div className={`p-toast p-toast--${toast.kind}`} data-shown={shown} role="status">
+      {toast.text}
+    </div>
+  );
 }
 
 // Barra de progresso determinada (valor de 0 a 1).
 export function Progress({ value, label }) {
   const pct = Math.round(Math.min(1, Math.max(0, value)) * 100);
-  return <div className="p-progress" role="progressbar" aria-valuemin={0} aria-valuemax={100} aria-valuenow={pct} aria-label={label}><i style={{ transform: `scaleX(${pct / 100})` }} /></div>;
+  return (
+    <div className="p-progress" role="progressbar" aria-valuemin={0} aria-valuemax={100} aria-valuenow={pct} aria-label={label}>
+      <i style={{ transform: `scaleX(${pct / 100})` }} />
+    </div>
+  );
 }
 
 // Círculo de perfil com menu: mostra quem está usando o gerenciador.
@@ -75,27 +147,65 @@ export function ProfileMenu({ user, items, onLogout, dark = false }) {
   const [mounted, shown] = usePresence(open, 140);
   useEffect(() => {
     if (!open) return;
-    const away = (e) => { if (!ref.current?.contains(e.target)) setOpen(false); };
-    const esc = (e) => { if (e.key === 'Escape') setOpen(false); };
-    document.addEventListener('mousedown', away); document.addEventListener('keydown', esc);
-    return () => { document.removeEventListener('mousedown', away); document.removeEventListener('keydown', esc); };
+    const away = (e) => {
+      if (!ref.current?.contains(e.target)) setOpen(false);
+    };
+    const esc = (e) => {
+      if (e.key === 'Escape') setOpen(false);
+    };
+    document.addEventListener('mousedown', away);
+    document.addEventListener('keydown', esc);
+    return () => {
+      document.removeEventListener('mousedown', away);
+      document.removeEventListener('keydown', esc);
+    };
   }, [open]);
   return (
     <div className={`p-profile ${dark ? 'p-profile--dark' : ''}`} ref={ref}>
-      <button type="button" className="p-profile-btn" aria-haspopup="menu" aria-expanded={open} aria-label={`Perfil de ${user.name}`} onClick={() => setOpen(!open)}>
+      <button
+        type="button"
+        className="p-profile-btn"
+        aria-haspopup="menu"
+        aria-expanded={open}
+        aria-label={`Perfil de ${user.name}`}
+        onClick={() => setOpen(!open)}
+      >
         <Avatar name={user.name} size={38} tone={dark ? 'orange' : 'navy'} />
-        <span className="p-profile-who"><b>{user.name}</b><small>{roleName(user)}</small></span>
+        <span className="p-profile-who">
+          <b>{user.name}</b>
+          <small>{roleName(user)}</small>
+        </span>
         <Ico name="chevron" size={16} />
       </button>
       {mounted ? (
         <div className="p-profile-menu" role="menu" data-shown={shown}>
           <div className="p-profile-head">
             <Avatar name={user.name} size={46} />
-            <div><b>{user.name}</b><small>{user.email || user.username}</small><span className={`p-badge ${user.admin ? 'p-badge--admin' : ''}`}>{roleName(user)}</span></div>
+            <div>
+              <b>{user.name}</b>
+              <small>{user.email || user.username}</small>
+              <span className={`p-badge ${user.admin ? 'p-badge--admin' : ''}`}>{roleName(user)}</span>
+            </div>
           </div>
-          {items.map(([label, action]) => <button type="button" role="menuitem" key={label} onClick={() => { setOpen(false); action(); }}>{label}</button>)}
-          <a role="menuitem" href="/" target="_blank" rel="noopener">Ver o site ↗</a>
-          <button type="button" role="menuitem" className="p-profile-out" onClick={onLogout}>Sair</button>
+          {items.map(([label, action]) => (
+            <button
+              type="button"
+              role="menuitem"
+              key={label}
+              onClick={() => {
+                setOpen(false);
+                action();
+              }}
+            >
+              {label}
+            </button>
+          ))}
+          <a role="menuitem" href="/" target="_blank" rel="noopener">
+            Ver o site ↗
+          </a>
+          <button type="button" role="menuitem" className="p-profile-out" onClick={onLogout}>
+            Sair
+          </button>
         </div>
       ) : null}
     </div>

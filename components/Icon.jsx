@@ -6,7 +6,15 @@ export default function Icon({ name, size = 20, className = '', title }) {
   if (!ic) return null;
   const viewBox = ic.vb || `0 0 ${ic.w} ${ic.h}`;
   return (
-    <svg className={`icon ${className}`} viewBox={viewBox} width={size} height={size} fill="currentColor" aria-hidden={title ? undefined : true} role={title ? 'img' : undefined}>
+    <svg
+      className={`icon ${className}`}
+      viewBox={viewBox}
+      width={size}
+      height={size}
+      fill="currentColor"
+      aria-hidden={title ? undefined : true}
+      role={title ? 'img' : undefined}
+    >
       {title ? <title>{title}</title> : null}
       <path d={ic.d} />
     </svg>
