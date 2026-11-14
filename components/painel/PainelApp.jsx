@@ -360,14 +360,14 @@ function Conta({ me, locked, notify }) {
 
 function Suporte({ notify }) {
   const [cfg, setCfg] = useState(null);
-  const [f, setF] = useState({ apiKey: '', webhookUrl: '', webhookSecret: '' });
+  const [f, setF] = useState({ provider: 'openai', model: '', apiKey: '', webhookUrl: '', webhookSecret: '' });
   const [tickets, setTickets] = useState([]);
   const [busy, setBusy] = useState(false);
   const loadTickets = () => api('support/tickets').then((d) => setTickets(d.tickets)).catch(() => {});
-  useEffect(() => { api('support/settings').then((c) => { setCfg(c); setF({ apiKey: '', webhookUrl: c.webhookUrl, webhookSecret: '' }); }).catch((e) => notify(e.message, 'erro')); loadTickets(); }, []);
+  useEffect(() => { api('support/settings').then((c) => { setCfg(c); setF({ provider: c.provider, model: c.model, apiKey: '', webhookUrl: c.webhookUrl, webhookSecret: '' }); }).catch((e) => notify(e.message, 'erro')); loadTickets(); }, []);
   async function salvar(e) {
     e.preventDefault(); setBusy(true);
-    try { const c = await api('support/settings', { method: 'PUT', data: f }); setCfg(c); setF({ apiKey: '', webhookUrl: c.webhookUrl, webhookSecret: '' }); notify('Configuração do suporte salva.'); } catch (err) { notify(err.message, 'erro'); }
+    try { const c = await api('support/settings', { method: 'PUT', data: f }); setCfg(c); setF({ provider: c.provider, model: c.model, apiKey: '', webhookUrl: c.webhookUrl, webhookSecret: '' }); notify('Configuração do suporte salva.'); } catch (err) { notify(err.message, 'erro'); }
     setBusy(false);
   }
   async function remover(what) {
@@ -393,8 +393,15 @@ function Suporte({ notify }) {
         <div className="p-card-body">
           <h2>Assistente com IA</h2>
           <div className="p-field">
-            <label>Chave de API da Anthropic (Claude)<input type="password" value={f.apiKey} onChange={(e) => setF({ ...f, apiKey: e.target.value })} autoComplete="off" spellCheck={false} placeholder={cfg.hasKey ? `Chave salva (${cfg.keyHint}). Deixe vazio para manter.` : 'sk-ant-…'} /></label>
-            <p className="p-help">Crie em console.anthropic.com → API Keys. A chave vai direto do seu navegador para o servidor do site, fica cifrada no banco e nunca mais é exibida. O uso é cobrado na conta dessa chave.</p>
+            <label>Provedor de IA<select value={f.provider} onChange={(e) => setF({ ...f, provider: e.target.value, model: cfg.providers[e.target.value].defaultModel })}>{Object.entries(cfg.providers).map(([k, v]) => <option key={k} value={k}>{v.label}</option>)}</select></label>
+          </div>
+          <div className="p-field">
+            <label>Modelo<input value={f.model} onChange={(e) => setF({ ...f, model: e.target.value })} spellCheck={false} placeholder={cfg.providers[f.provider].defaultModel} /></label>
+            <p className="p-help">Use o nome exato do modelo na sua conta. Modelos menores ("mini", "nano", "haiku") custam bem menos e dão conta do suporte. Se o nome estiver errado, o chat mostra o motivo para você.</p>
+          </div>
+          <div className="p-field">
+            <label>Chave de API ({cfg.providers[f.provider].label})<input type="password" value={f.apiKey} onChange={(e) => setF({ ...f, apiKey: e.target.value })} autoComplete="off" spellCheck={false} placeholder={cfg.hasKey && f.provider === cfg.provider ? `Chave salva (${cfg.keyHint}). Deixe vazio para manter.` : f.provider === 'openai' ? 'sk-…' : 'sk-ant-…'} /></label>
+            <p className="p-help">Crie em {f.provider === 'openai' ? 'platform.openai.com → API keys' : 'console.anthropic.com → API Keys'}. A chave vai direto do seu navegador para o servidor do site, fica cifrada no banco e nunca mais é exibida. O uso é cobrado na conta dessa chave.</p>
             {cfg.hasKey ? <button type="button" className="p-btn p-btn--danger" onClick={() => remover('removeKey')}>Remover a chave salva</button> : null}
           </div>
           <h2>CRM (demandas)</h2>
