@@ -11,8 +11,11 @@ export async function POST(req) {
   loginFailed(key);
   const user = email ? await findUser(email) : null;
   if (user?.email) {
-    try { await passwordLinkMail(user, await createPasswordToken(user, 30), 'recuperar'); }
-    catch (e) { console.error('Recuperação de senha: e-mail não enviado:', e.message); }
+    try {
+      await passwordLinkMail(user, await createPasswordToken(user, 30), 'recuperar');
+    } catch (e) {
+      console.error('Recuperação de senha: e-mail não enviado:', e.message);
+    }
   }
   return json({ ok: true });
 }

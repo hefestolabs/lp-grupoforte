@@ -11,7 +11,9 @@ export default function Carousel({ slides }) {
   const all = [...slides, ...slides, ...slides];
 
   useEffect(() => {
-    const id = setInterval(() => { if (!paused.current) setI((v) => v + 1); }, 5000);
+    const id = setInterval(() => {
+      if (!paused.current) setI((v) => v + 1);
+    }, 5000);
     return () => clearInterval(id);
   }, []);
 
@@ -29,7 +31,11 @@ export default function Carousel({ slides }) {
         <Icon name="e-eicon-chevron-left" size={25} />
       </button>
       <div className="carousel-viewport">
-        <ul className="carousel-track" style={{ transform: `translateX(calc(var(--slide) * ${-i}))`, transition: anim ? 'transform .5s ease' : 'none' }} onTransitionEnd={onEnd}>
+        <ul
+          className="carousel-track"
+          style={{ transform: `translateX(calc(var(--slide) * ${-i}))`, transition: anim ? 'transform .5s ease' : 'none' }}
+          onTransitionEnd={onEnd}
+        >
           {all.map((s, k) => (
             <li key={k} aria-hidden={k < n || k >= 2 * n}>
               <img src={s.src} alt={s.alt} width="168" height="168" loading="lazy" />

@@ -1,5 +1,5 @@
-import Icon from '@/components/Icon';
 import Eyebrow from '@/components/Eyebrow';
+import Icon from '@/components/Icon';
 import PageHero from '@/components/PageHero';
 import { getContent } from '@/lib/content';
 import { rich } from '@/lib/data';
@@ -17,7 +17,16 @@ export default async function SobreNos() {
 
       <section className="sobre">
         <div className="container">
-          <a className="sobre-banner" data-edit="sobre:topo" style={{ backgroundImage: `url(${s.banner})` }} href={s.bannerLink || undefined} aria-label="Assistir ao vídeo institucional" data-reveal />
+          <a
+            className="sobre-banner"
+            data-edit="sobre:topo"
+            style={{ backgroundImage: `url(${s.banner})` }}
+            href={s.bannerLink || undefined}
+            aria-label="Assistir ao vídeo institucional"
+            data-reveal
+          >
+            <span className="sr-only">Assistir ao vídeo institucional</span>
+          </a>
           <div className="sobre-cols" data-edit="sobre:texto">
             <div className="sobre-texto">
               <Eyebrow className="eyebrow--plain eyebrow--small">Sobre nós</Eyebrow>
@@ -54,7 +63,11 @@ export default async function SobreNos() {
         <section className="sobre-logos" data-edit="sobre:logos">
           <div className="container">
             <div className="sobre-logos-row">
-              {s.logos.filter((l) => l.img).map((l, i) => <img key={i} data-reveal style={{ '--d': `${i * 120}ms` }} src={l.img} alt={l.nome} width="186" height="67" loading="lazy" />)}
+              {s.logos
+                .filter((l) => l.img)
+                .map((l, i) => (
+                  <img key={i} data-reveal style={{ '--d': `${i * 120}ms` }} src={l.img} alt={l.nome} width="186" height="67" loading="lazy" />
+                ))}
             </div>
           </div>
         </section>
@@ -69,20 +82,29 @@ export default async function SobreNos() {
                 {l.video ? (
                   <a className="lider-video" href={l.video} aria-label={`Assistir ao vídeo de ${l.nome}`} data-reveal>
                     {l.capa ? <img src={l.capa} alt={`${l.nome}, ${l.cargo} do Grupo Forte`} loading="lazy" /> : null}
-                    <span className="lider-play"><Icon name="e-eicon-play" size={24} /></span>
+                    <span className="lider-play">
+                      <Icon name="e-eicon-play" size={24} />
+                    </span>
                   </a>
                 ) : (
                   <div className="lider-video lider-video--exemplo" data-reveal role="img" aria-label={`Vídeo de ${l.nome} (em breve)`}>
                     {l.foto ? <img className="lider-exemplo-foto" src={l.foto} alt="" loading="lazy" /> : null}
-                    <span className="lider-play"><Icon name="e-eicon-play" size={24} /></span>
-                    <span className="lider-exemplo-legenda"><b>{l.nome}</b>Vídeo em breve</span>
+                    <span className="lider-play">
+                      <Icon name="e-eicon-play" size={24} />
+                    </span>
+                    <span className="lider-exemplo-legenda">
+                      <b>{l.nome}</b>Vídeo em breve
+                    </span>
                   </div>
                 )}
                 <figure className="depoimento" data-reveal>
                   <blockquote>{l.frase}</blockquote>
                   <figcaption>
                     {l.foto ? <img src={l.foto} alt="" width="60" height="60" loading="lazy" /> : null}
-                    <span><b>{l.nome}</b>{l.cargo}</span>
+                    <span>
+                      <b>{l.nome}</b>
+                      {l.cargo}
+                    </span>
                   </figcaption>
                 </figure>
               </div>

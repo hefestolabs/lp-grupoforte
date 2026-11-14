@@ -8,14 +8,21 @@ export default function EditBridge() {
     document.documentElement.classList.add('gf-editing');
     const tell = (msg) => window.parent?.postMessage({ source: 'gf-previa', ...msg }, window.location.origin);
     const onClick = (e) => {
-      e.preventDefault(); e.stopPropagation();
+      e.preventDefault();
+      e.stopPropagation();
       // Clicar em um item do menu do site troca a página que está sendo editada.
       const menu = e.target.closest('a[data-page]');
       if (menu) return tell({ type: 'page', id: menu.getAttribute('data-page') });
       const el = e.target.closest('[data-edit]');
-      if (el) { mark(el.getAttribute('data-edit')); tell({ type: 'select', id: el.getAttribute('data-edit') }); }
+      if (el) {
+        mark(el.getAttribute('data-edit'));
+        tell({ type: 'select', id: el.getAttribute('data-edit') });
+      }
     };
-    const mark = (id) => document.querySelectorAll('[data-edit]').forEach((n) => n.classList.toggle('gf-selected', n.getAttribute('data-edit') === id));
+    const mark = (id) =>
+      document.querySelectorAll('[data-edit]').forEach((n) => {
+        n.classList.toggle('gf-selected', n.getAttribute('data-edit') === id);
+      });
     const onMessage = (e) => {
       if (e.origin !== window.location.origin || e.data?.source !== 'gf-painel') return;
       if (e.data.type === 'focus') {
@@ -30,7 +37,11 @@ export default function EditBridge() {
     window.addEventListener('message', onMessage);
     window.addEventListener('scroll', onScroll, { passive: true });
     tell({ type: 'ready', path: window.location.pathname });
-    return () => { document.removeEventListener('click', onClick, true); window.removeEventListener('message', onMessage); window.removeEventListener('scroll', onScroll); };
+    return () => {
+      document.removeEventListener('click', onClick, true);
+      window.removeEventListener('message', onMessage);
+      window.removeEventListener('scroll', onScroll);
+    };
   }, []);
   return null;
 }

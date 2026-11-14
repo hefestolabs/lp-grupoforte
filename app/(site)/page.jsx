@@ -1,15 +1,15 @@
 import Link from 'next/link';
-import Icon from '@/components/Icon';
-import Eyebrow from '@/components/Eyebrow';
-import BrandCards from '@/components/BrandCards';
-import Counter from '@/components/Counter';
 import Accordion from '@/components/Accordion';
+import BrandCards from '@/components/BrandCards';
 import Carousel from '@/components/Carousel';
-import PostGrid from '@/components/PostGrid';
+import Counter from '@/components/Counter';
+import Eyebrow from '@/components/Eyebrow';
 import HeroVideo from '@/components/HeroVideo';
+import Icon from '@/components/Icon';
+import PostGrid from '@/components/PostGrid';
 import SmartLink from '@/components/SmartLink';
-import { getPosts } from '@/lib/data';
 import { getContent, youtubeId } from '@/lib/content';
+import { getPosts } from '@/lib/data';
 
 export default async function Home() {
   const { home: h, contatos } = await getContent();
@@ -25,7 +25,9 @@ export default async function Home() {
         <div className="hero">
           {videoId ? <HeroVideo id={videoId} start={h.heroVideoInicio} /> : null}
           <div className="hero-overlay" />
-          {h.heroLogo ? <img src={h.heroLogo} alt="Grupo Forte — Tradição, Inovação e Qualidade no Setor da Construção" width="496" height="120" data-reveal /> : null}
+          {h.heroLogo ? (
+            <img src={h.heroLogo} alt="Grupo Forte — Tradição, Inovação e Qualidade no Setor da Construção" width="496" height="120" data-reveal />
+          ) : null}
         </div>
       </section>
 
@@ -42,8 +44,13 @@ export default async function Home() {
               {h.unidades.map((u, i) => (
                 <div className="unidade" key={i}>
                   <strong>{u.tipo}</strong>
-                  <span className="unidade-local"><Icon name="e-fas-map-marker-alt" size={25} />{u.local}</span>
-                  <ul><li>{u.texto}</li></ul>
+                  <span className="unidade-local">
+                    <Icon name="e-fas-map-marker-alt" size={25} />
+                    {u.local}
+                  </span>
+                  <ul>
+                    <li>{u.texto}</li>
+                  </ul>
                 </div>
               ))}
             </div>
@@ -54,7 +61,9 @@ export default async function Home() {
       <section className="counters-wrap" data-edit="home:numeros">
         <div className="container">
           <div className="counters">
-            {h.contadores.map((c, i) => <Counter key={i} title={c.titulo} end={c.valor} prefix={c.prefixo} suffix={c.sufixo} />)}
+            {h.contadores.map((c, i) => (
+              <Counter key={i} title={c.titulo} end={c.valor} prefix={c.prefixo} suffix={c.sufixo} />
+            ))}
           </div>
         </div>
       </section>
@@ -70,7 +79,11 @@ export default async function Home() {
               </a>
             </div>
             <div className="insta-arte" style={{ backgroundImage: `url(${h.instagramArte})` }}>
-              {h.instagramPost ? <a href={h.instagramPost} aria-label="Ver publicação no Instagram"><Icon name="heart" size={25} /></a> : null}
+              {h.instagramPost ? (
+                <a href={h.instagramPost} aria-label="Ver publicação no Instagram">
+                  <Icon name="heart" size={25} />
+                </a>
+              ) : null}
             </div>
           </div>
           <div className="servicos-main" data-edit="home:servicos">
@@ -86,12 +99,20 @@ export default async function Home() {
                     <h3>{s.titulo}</h3>
                   </div>
                   <p>{s.texto}</p>
-                  {s.link ? <SmartLink className="btn btn-mini" href={s.link}><span>Saiba mais</span><Icon name="arrow-up-right" size={15} /></SmartLink> : null}
+                  {s.link ? (
+                    <SmartLink className="btn btn-mini" href={s.link}>
+                      <span>Saiba mais</span>
+                      <Icon name="arrow-up-right" size={15} />
+                    </SmartLink>
+                  ) : null}
                 </article>
               ))}
               <article className="card-navy servico-cta" data-reveal style={{ '--d': '360ms' }}>
                 <h4>{h.chamadaTexto}</h4>
-                <SmartLink className="btn btn-orange btn-bordered" href={h.chamadaLink}><span>{h.chamadaBotao}</span><Icon name="arrow-up-right" size={15} /></SmartLink>
+                <SmartLink className="btn btn-orange btn-bordered" href={h.chamadaLink}>
+                  <span>{h.chamadaBotao}</span>
+                  <Icon name="arrow-up-right" size={15} />
+                </SmartLink>
               </article>
             </div>
           </div>
@@ -119,7 +140,9 @@ export default async function Home() {
           <div className="container">
             <div data-reveal>
               <Eyebrow className="eyebrow--center">Parceiros</Eyebrow>
-              <h2 className="h-light">Empresas que confiam no <b>GRUPOFORTE</b></h2>
+              <h2 className="h-light">
+                Empresas que confiam no <b>GRUPOFORTE</b>
+              </h2>
             </div>
             <div className="parceiros-panel">
               <Carousel slides={h.parceiros.filter((p) => p.img).map((p) => ({ src: p.img, alt: p.nome }))} />
@@ -135,7 +158,10 @@ export default async function Home() {
               <Eyebrow className="eyebrow--plain">Notícias e insights</Eyebrow>
               <h2 className="h-light h-navy">{h.noticiasTitulo}</h2>
             </div>
-            <Link className="btn btn-cta btn-cta--hover" href="/noticias/"><span>Saiba mais</span><Icon name="arrow-up-right" size={16} /></Link>
+            <Link className="btn btn-cta btn-cta--hover" href="/noticias/">
+              <span>Saiba mais</span>
+              <Icon name="arrow-up-right" size={16} />
+            </Link>
           </div>
           <PostGrid posts={posts} />
         </div>

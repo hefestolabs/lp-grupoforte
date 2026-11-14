@@ -9,8 +9,13 @@ export async function GET() {
   return json(await getAllPostsAdmin());
 }
 export async function POST(req) {
-  const g = await guard(); if (g.error) return g.error;
-  const { post, error } = readPost(await body(req)); if (error) return fail(error);
-  try { return json({ ok: true, id: await postSave(post) }); }
-  catch (e) { return e.code === 'ER_DUP_ENTRY' ? fail('Já existe uma notícia com esse endereço. Mude o título ou o endereço.') : fail('Não foi possível salvar.', 500); }
+  const g = await guard();
+  if (g.error) return g.error;
+  const { post, error } = readPost(await body(req));
+  if (error) return fail(error);
+  try {
+    return json({ ok: true, id: await postSave(post) });
+  } catch (e) {
+    return e.code === 'ER_DUP_ENTRY' ? fail('Já existe uma notícia com esse endereço. Mude o título ou o endereço.') : fail('Não foi possível salvar.', 500);
+  }
 }

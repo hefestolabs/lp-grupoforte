@@ -23,13 +23,13 @@ Em `/painel/` um funcionário do cliente atualiza o site sem mexer em código: n
 
 ## Estrutura
 
-| Pasta | Conteúdo |
-|---|---|
-| `app/` | Páginas (home, sobre-nos, produtos, trabalhe-conosco, noticias, notícia, categoria) e estilos |
-| `components/` | Cabeçalho, rodapé, carrossel, sanfona, contadores, grade de notícias |
-| `lib/` | Dados do site, acesso ao WordPress e ícones em SVG |
-| `public/img/` | Imagens |
-| `docs/demandas/` | Uma demanda por arquivo (use `_modelo.md` como base) |
+| Pasta            | Conteúdo                                                                                      |
+| ---------------- | --------------------------------------------------------------------------------------------- |
+| `app/`           | Páginas (home, sobre-nos, produtos, trabalhe-conosco, noticias, notícia, categoria) e estilos |
+| `components/`    | Cabeçalho, rodapé, carrossel, sanfona, contadores, grade de notícias                          |
+| `lib/`           | Dados do site, acesso ao WordPress e ícones em SVG                                            |
+| `public/img/`    | Imagens                                                                                       |
+| `docs/demandas/` | Uma demanda por arquivo (use `_modelo.md` como base)                                          |
 
 ## Rodar localmente
 

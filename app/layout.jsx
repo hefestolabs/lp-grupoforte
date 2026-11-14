@@ -19,7 +19,9 @@ export default function RootLayout({ children }) {
         <link rel="dns-prefetch" href="https://googlevideo.com" />
         {/* Liga os efeitos de entrada antes da primeira pintura; sem JavaScript o conteúdo fica visível. */}
         <script dangerouslySetInnerHTML={{ __html: "document.documentElement.classList.add('js-reveal')" }} />
-        <noscript><style>{'[data-reveal]{opacity:1!important;animation:none!important}'}</style></noscript>
+        <noscript>
+          <style>{'[data-reveal]{opacity:1!important;animation:none!important}'}</style>
+        </noscript>
       </head>
       <body>{children}</body>
     </html>

@@ -12,5 +12,25 @@ export default async function Painel() {
   const user = await getSession();
   if (!user) redirect('/painel/login/');
   const [content, posts] = await Promise.all([getContent(), getAllPostsAdmin()]);
-  return <PainelApp storeMode={storeMode()} user={user} schema={SCHEMA} initialContent={content} initialPosts={posts} initialUsers={user.admin ? users.map((u) => ({ id: u.id, username: u.username, email: u.email || '', name: u.name, mustChange: Boolean(u.must_change), admin: u.role === 'admin' })) : []} />;
+  return (
+    <PainelApp
+      storeMode={storeMode()}
+      user={user}
+      schema={SCHEMA}
+      initialContent={content}
+      initialPosts={posts}
+      initialUsers={
+        user.admin
+          ? users.map((u) => ({
+              id: u.id,
+              username: u.username,
+              email: u.email || '',
+              name: u.name,
+              mustChange: Boolean(u.must_change),
+              admin: u.role === 'admin',
+            }))
+          : []
+      }
+    />
+  );
 }

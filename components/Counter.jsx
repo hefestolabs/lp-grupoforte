@@ -10,24 +10,34 @@ export default function Counter({ end, prefix = '', suffix = '', title, duration
     if (!el || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
     setValue(0);
     let raf;
-    const io = new IntersectionObserver(([e]) => {
-      if (!e.isIntersecting) return;
-      io.disconnect();
-      const t0 = performance.now();
-      const tick = (t) => {
-        const p = Math.min(1, (t - t0) / duration);
-        setValue(Math.round(end * p));
-        if (p < 1) raf = requestAnimationFrame(tick);
-      };
-      raf = requestAnimationFrame(tick);
-    }, { threshold: 0.3 });
+    const io = new IntersectionObserver(
+      ([e]) => {
+        if (!e.isIntersecting) return;
+        io.disconnect();
+        const t0 = performance.now();
+        const tick = (t) => {
+          const p = Math.min(1, (t - t0) / duration);
+          setValue(Math.round(end * p));
+          if (p < 1) raf = requestAnimationFrame(tick);
+        };
+        raf = requestAnimationFrame(tick);
+      },
+      { threshold: 0.3 },
+    );
     io.observe(el);
-    return () => { io.disconnect(); cancelAnimationFrame(raf); };
+    return () => {
+      io.disconnect();
+      cancelAnimationFrame(raf);
+    };
   }, [end, duration]);
   return (
     <div className="counter" ref={ref}>
       <div className="counter-title">{title}</div>
-      <div className="counter-number">{prefix}{value}{suffix}</div>
+      <div className="counter-number">
+        {prefix}
+        {value}
+        {suffix}
+      </div>
     </div>
   );
 }

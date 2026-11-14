@@ -3,7 +3,6 @@ import Eyebrow from '@/components/Eyebrow';
 import PostGrid from '@/components/PostGrid';
 import { getPosts } from '@/lib/data';
 
-
 export async function generateMetadata({ params }) {
   const { slug } = await params;
   const { category } = await getPosts({ category: slug });

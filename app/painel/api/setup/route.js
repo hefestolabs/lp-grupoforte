@@ -10,7 +10,15 @@ export async function POST(req) {
   const u = normEmail(username);
   if (!validEmail(u)) return fail('Informe um e-mail válido.');
   if (!String(name).trim()) return fail('Informe o nome.');
-  const problem = passwordProblem(password); if (problem) return fail(problem);
-  await userSave({ role: 'admin', username: u, email: u, name: String(name).trim().slice(0, 100), pass_hash: hashPassword(password), must_change: Boolean(mustChange) });
+  const problem = passwordProblem(password);
+  if (problem) return fail(problem);
+  await userSave({
+    role: 'admin',
+    username: u,
+    email: u,
+    name: String(name).trim().slice(0, 100),
+    pass_hash: hashPassword(password),
+    must_change: Boolean(mustChange),
+  });
   return json({ ok: true });
 }

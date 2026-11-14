@@ -14,15 +14,28 @@ function sniff(b) {
 }
 
 export async function POST(req) {
-  const g = await guard(); if (g.error) return g.error;
+  const g = await guard();
+  if (g.error) return g.error;
   let file;
-  try { file = (await req.formData()).get('file'); } catch { return fail('Envio inválido.'); }
+  try {
+    file = (await req.formData()).get('file');
+  } catch {
+    return fail('Envio inválido.');
+  }
   if (!file || typeof file === 'string') return fail('Nenhum arquivo enviado.');
   if (file.size > MAX) return fail('A imagem passa de 6 MB. Reduza e envie de novo.');
   const buffer = Buffer.from(await file.arrayBuffer());
   const mime = sniff(buffer);
   if (!mime || !TYPES[mime]) return fail('Formato não aceito. Use JPG, PNG, WebP ou GIF.');
-  const base = String(file.name || 'imagem').replace(/\.[^.]+$/, '').normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 60) || 'imagem';
+  const base =
+    String(file.name || 'imagem')
+      .replace(/\.[^.]+$/, '')
+      .normalize('NFD')
+      .replace(/[̀-ͯ]/g, '')
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/^-+|-+$/g, '')
+      .slice(0, 60) || 'imagem';
   const name = `${base}.${TYPES[mime]}`;
   const id = await mediaPut({ name, mime, buffer });
   return json({ ok: true, url: `/midia/${id}/${name}` });
