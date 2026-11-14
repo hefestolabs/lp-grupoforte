@@ -51,3 +51,7 @@ O site roda na Hostinger como aplicação Node.js (Next.js, saída `.next`, Node
 2. Criar uma branch `demanda/NNN-titulo-curto` a partir de `main`.
 3. Implementar, abrir pull request e revisar.
 4. Após o merge, marcar a demanda como concluída.
+
+## Como contribuir
+
+Issues, branches, PRs e deploy seguem o fluxo descrito em [AGENTS.md](AGENTS.md).
