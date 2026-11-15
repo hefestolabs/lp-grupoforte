@@ -5,7 +5,8 @@ import { Field } from './Fields';
 import dynamic from 'next/dynamic';
 import Dashboard from './Dashboard';
 import { Avatar, Ico, Img, NetBar, ProfileMenu, Toast, roleName } from './ui';
-import { CardSkeleton, EditorSkeleton, RowsSkeleton } from './Skeleton';
+import Opening, { SITES, SiteSoon } from './Opening';
+import { CardSkeleton, EditorSkeleton, RowsSkeleton, ShellSkeleton } from './Skeleton';
 
 // Partes pesadas são baixadas só quando usadas.
 const Editor = dynamic(() => import('./Editor'), { ssr: false, loading: () => <EditorSkeleton /> });
@@ -28,6 +29,14 @@ export default function PainelApp({ storeMode, user, schema, initialContent, ini
   const [menu, setMenu] = useState(false);
   const [startNew, setStartNew] = useState(0); // abre Notícias já no formulário de nova notícia
   const locked = user.mustChange;
+  // Site em gerenciamento: undefined = ainda lendo a escolha salva; null = mostrar a abertura.
+  const [site, setSite] = useState(undefined);
+  useEffect(() => {
+    let saved = null;
+    try { saved = sessionStorage.getItem('gf-site'); } catch {}
+    setSite(SITES.some((x) => x.id === saved) ? saved : null);
+  }, []);
+  const chooseSite = (id) => { try { if (id) sessionStorage.setItem('gf-site', id); else sessionStorage.removeItem('gf-site'); } catch {} setSite(id); };
 
   const section = schema.find((s) => s.id === tab);
   const dirty = section ? JSON.stringify(content[tab]) !== JSON.stringify(saved[tab]) : false;
@@ -61,7 +70,13 @@ export default function PainelApp({ storeMode, user, schema, initialContent, ini
   // Navegação com destino composto: 'editor:sobre' abre o editor naquela página; 'noticias:nova' abre o formulário.
   const open = (t) => { if (locked) return; const [name, mode] = t.split(':'); if (name === 'editor' && mode) setEditorPage(mode); setStartNew(name === 'noticias' && mode === 'nova' ? Date.now() : 0); if (name !== 'noticias' || mode === 'nova') setOpenPostId(0); setTab(name); setMenu(false); window.scrollTo(0, 0); };
   const chat = locked ? null : <SupportChat user={user} admin={user.admin} screen={tab === 'editor' ? 'Editar o site' : titles[tab]} goSettings={() => open('suporte')} />;
-  const profileItems = [['Início', () => open('inicio')], ['Minha conta', () => open('senha')]];
+  const profileItems = [['Início', () => open('inicio')], ['Minha conta', () => open('senha')], ['Trocar de site', () => chooseSite(null)]];
+
+  if (!locked) {
+    if (site === undefined) return <ShellSkeleton />;
+    if (site === null) return <Opening user={user} onChoose={chooseSite} />;
+    if (site !== 'grupoforte') return <SiteSoon site={SITES.find((x) => x.id === site)} onBack={() => chooseSite(null)} />;
+  }
 
   if (tab === 'editor') {
     return (
