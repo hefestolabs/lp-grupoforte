@@ -63,7 +63,7 @@ export default function PainelApp({ storeMode, user, schema, initialContent, ini
     } catch (e) { notify(e.message, 'erro'); }
     setBusy(false);
   }
-  async function logout() { await api('logout', { method: 'POST' }).catch(() => {}); window.location.href = '/painel/login/'; }
+  async function logout() { await api('logout', { method: 'POST' }).catch(() => {}); try { sessionStorage.removeItem('gf-site'); sessionStorage.removeItem('gf-intro'); } catch {} window.location.href = '/painel/login/'; }
 
   const nav = [['inicio', 'Início', 'home'], ['editor', 'Editar o site', 'edit'], ['noticias', 'Notícias', 'news'], ...(user.admin ? [['acessos', 'Acessos', 'users'], ['email', 'E-mail (Resend)', 'mail'], ['suporte', 'Suporte (IA e CRM)', 'chat']] : []), ['senha', 'Minha conta', 'user']];
   const titles = Object.fromEntries(nav.map(([id, label]) => [id, label]));
