@@ -20,6 +20,8 @@ export default function AuthForm({ mode, u, t }) {
       if (mode === 'reset') { await api('reset', { method: 'POST', data: { u, t, password: f.password } }); setDone('Senha criada. Agora é só entrar.'); setBusy(false); return; }
       if (mode === 'setup') await api('setup', { method: 'POST', data: { name: f.name, username: f.username, password: f.password } });
       await api('login', { method: 'POST', data: { username: f.username, password: f.password } });
+      // Cada login começa pela abertura: apaga a escolha de site e a marca de vinheta já vista nesta aba.
+      try { sessionStorage.removeItem('gf-site'); sessionStorage.removeItem('gf-intro'); } catch {}
       window.location.href = '/painel/';
     } catch (err) { setError(err.message); setBusy(false); }
   }
