@@ -4,7 +4,7 @@ import { api } from './api';
 import { Field } from './Fields';
 import dynamic from 'next/dynamic';
 import Dashboard from './Dashboard';
-import { Avatar, Ico, Img, NetBar, ProfileMenu, Toast, roleName } from './ui';
+import { Avatar, Ico, Img, NetBar, ProfileMenu, ThemeToggle, Toast, roleName } from './ui';
 import Opening, { SITES, SiteSoon, SiteView } from './Opening';
 import { CardSkeleton, EditorSkeleton, RowsSkeleton, ShellSkeleton } from './Skeleton';
 
@@ -106,11 +106,12 @@ export default function PainelApp({ storeMode, user, schema, initialContent, ini
       <NetBar />
       <aside className={`p-side ${menu ? 'is-open' : ''}`}>
         <div className="p-side-top">
-          <img src="/img/logo-branco.png" alt="Grupo Forte" width="150" height="43" />
+          <img className="p-side-logo" src="/img/logo-branco.png" alt="Grupo Forte" width="150" height="43" />
+          <img className="p-side-mark" src="/img/favicon.png" alt="Grupo Forte" width="40" height="40" />
           <button type="button" className="p-menu-btn" aria-expanded={menu} onClick={() => setMenu(!menu)}>Menu</button>
         </div>
         <nav aria-label="Seções do painel">
-          {nav.map(([id, label, icon]) => <button type="button" key={id} className={tab === id ? 'is-active' : ''} aria-current={tab === id ? 'page' : undefined} disabled={locked && id !== 'senha'} onClick={() => open(id)}><Ico name={icon} />{label}</button>)}
+          {nav.map(([id, label, icon]) => <button type="button" key={id} className={tab === id ? 'is-active' : ''} aria-current={tab === id ? 'page' : undefined} disabled={locked && id !== 'senha'} data-tip={label} onClick={() => open(id)}><Ico name={icon} /><span>{label}</span></button>)}
         </nav>
         <div className="p-side-foot">
           <a href="/" target="_blank" rel="noopener">Ver o site ↗</a>
@@ -124,6 +125,7 @@ export default function PainelApp({ storeMode, user, schema, initialContent, ini
           {storeMode !== 'mysql' ? <span className="p-pill p-pill--bad">Banco desconectado</span> : null}
           <span className="p-top-grow" />
           {!locked ? <button type="button" className="p-btn" onClick={() => open('noticias:nova')}>+ Nova notícia</button> : null}
+          <ThemeToggle />
           <ProfileMenu user={user} items={locked ? [] : profileItems} onLogout={logout} {...siteMenu} />
         </header>
       <main className={`p-main ${tab === 'inicio' ? 'p-main--wide' : ''}`}>
@@ -159,6 +161,23 @@ export default function PainelApp({ storeMode, user, schema, initialContent, ini
       </main>
       </div>
 
+      {!locked ? (
+        <aside className="p-rail" aria-label="Sites e equipe">
+          <div className="p-rail-group">
+            {SITES.map((x) => (
+              <button type="button" key={x.id} className={`p-rail-site ${x.id === site ? 'is-current' : ''}`} data-tip={x.nome} aria-label={`Ir para ${x.nome}`} aria-current={x.id === site ? 'true' : undefined} onClick={() => { if (x.id !== site) switchSite(x.id); }}>
+                <span className={`p-site-art ${x.logo ? 'p-site-art--logo' : ''}`}><img src={x.logo || x.img} alt="" /></span>
+              </button>
+            ))}
+          </div>
+          <div className="p-rail-group">
+            {(user.admin && users.length ? users : [user]).slice(0, 6).map((u) => (
+              <span key={u.id} className="p-rail-user" data-tip={u.name}><Avatar name={u.name} size={38} tone={u.id === user.id ? 'orange' : 'navy'} /></span>
+            ))}
+            {user.admin ? <button type="button" className="p-rail-add" data-tip="Gerenciar acessos" aria-label="Gerenciar acessos" onClick={() => open('acessos')}>+</button> : null}
+          </div>
+        </aside>
+      ) : null}
       <Toast toast={toast} open={toastOn} />
       {chat}
     </div>
