@@ -5,7 +5,7 @@ import { Field } from './Fields';
 import dynamic from 'next/dynamic';
 import Dashboard from './Dashboard';
 import { Avatar, Ico, Img, NetBar, ProfileMenu, Toast, roleName } from './ui';
-import Opening, { SITES, SiteSoon } from './Opening';
+import Opening, { SITES, SiteSoon, SiteView } from './Opening';
 import { CardSkeleton, EditorSkeleton, RowsSkeleton, ShellSkeleton } from './Skeleton';
 
 // Partes pesadas são baixadas só quando usadas.
@@ -75,7 +75,9 @@ export default function PainelApp({ storeMode, user, schema, initialContent, ini
   if (!locked) {
     if (site === undefined) return <ShellSkeleton />;
     if (site === null) return <Opening user={user} onChoose={chooseSite} />;
-    if (site !== 'grupoforte') return <SiteSoon site={SITES.find((x) => x.id === site)} onBack={() => chooseSite(null)} />;
+    const chosen = SITES.find((x) => x.id === site);
+    if (site !== 'grupoforte' && chosen.url) return <SiteView site={chosen} onBack={() => chooseSite(null)} />;
+    if (site !== 'grupoforte') return <SiteSoon site={chosen} onBack={() => chooseSite(null)} />;
   }
 
   if (tab === 'editor') {

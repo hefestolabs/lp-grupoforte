@@ -1,7 +1,8 @@
 "use client";
 import { useEffect, useState } from "react";
+import { PreviewSkeleton } from "./Skeleton";
 
-// Sites que o painel pode gerenciar. Só o Grupo Forte está ligado por enquanto.
+// Sites do grupo. `ready`: gerenciado por este painel. `url`: site no ar, ainda sem edição pelo painel.
 export const SITES = [
 	{
 		id: "grupoforte",
@@ -14,6 +15,7 @@ export const SITES = [
 		nome: "Reboforte",
 		img: "/img/marca-reboforte.jpg",
 		ready: false,
+		url: "https://violet-crane-553086.hostingersite.com/",
 	},
 	{
 		id: "dacor",
@@ -92,7 +94,7 @@ export default function Opening({ user, onChoose }) {
 						>
 							<Tile site={s} />
 							<b>{s.nome}</b>
-							{s.ready ? null : <small>Em preparação</small>}
+							{s.ready ? null : <small>{s.url ? "Site no ar" : "Em preparação"}</small>}
 						</button>
 					</li>
 				))}
@@ -115,5 +117,47 @@ export function SiteSoon({ site, onBack }) {
 				Escolher outro site
 			</button>
 		</main>
+	);
+}
+
+// Site do grupo que já está no ar, mas ainda não é editado por este painel: mostra a prévia e o link.
+export function SiteView({ site, onBack }) {
+	const [device, setDevice] = useState("desktop");
+	const [loaded, setLoaded] = useState(false);
+	return (
+		<div className="sv">
+			<header className="sv-bar">
+				<button type="button" className="ed-home" onClick={onBack}>
+					← Trocar de site
+				</button>
+				<b>{site.nome}</b>
+				<span className="sv-url">{site.url.replace(/^https?:\/\/|\/$/g, "")}</span>
+				<span className="ed-grow" />
+				<a className="ed-btn ed-btn--primary" href={site.url} target="_blank" rel="noopener">
+					Abrir o site ↗
+				</a>
+			</header>
+			<p className="sv-note">
+				Este site já está no ar. A edição do conteúdo dele por este painel ainda não está disponível.
+			</p>
+			<main className="sv-stage">
+				<div className="ed-devices" role="group" aria-label="Tamanho da prévia">
+					{[
+						["desktop", "Computador"],
+						["mobile", "Celular"],
+					].map(([id, label]) => (
+						<button type="button" key={id} className={device === id ? "is-active" : ""} aria-pressed={device === id} onClick={() => setDevice(id)}>
+							{label}
+						</button>
+					))}
+				</div>
+				<div className={`sv-frame sv-frame--${device}`}>
+					<iframe title={`Site da ${site.nome}`} src={site.url} loading="lazy" onLoad={() => setLoaded(true)} />
+					<div className={`ed-skel ${loaded ? "is-out" : ""}`}>
+						<PreviewSkeleton />
+					</div>
+				</div>
+			</main>
+		</div>
 	);
 }
