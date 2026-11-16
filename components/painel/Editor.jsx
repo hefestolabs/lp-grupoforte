@@ -8,7 +8,7 @@ import { ProfileMenu } from './ui';
 const DEVICES = [['desktop', 'Computador', '100%'], ['tablet', 'Tablet', '820px'], ['celular', 'Celular', '390px']];
 
 // Editor visual: prévia do site real à direita, campos da parte escolhida à esquerda.
-export default function Editor({ schema, content, setContent, saved, setSaved, notify, user, goTab, logout, startPage = 'home' }) {
+export default function Editor({ siteMenu, schema, content, setContent, saved, setSaved, notify, user, goTab, logout, startPage = 'home' }) {
   const pages = useMemo(() => [
     { id: 'home', label: 'Página inicial', short: 'Home', path: '/', section: 'home' },
     { id: 'sobre', label: 'Sobre nós', short: 'Sobre nós', path: '/sobre-nos/', section: 'sobre' },
@@ -107,7 +107,7 @@ export default function Editor({ schema, content, setContent, saved, setSaved, n
         <span className={`ed-state ${dirty ? 'is-dirty' : ''}`}>{state === 'atualizando' ? 'Atualizando a prévia…' : dirty ? 'Alterações não publicadas' : 'Tudo publicado'}</span>
         {dirty ? <button type="button" className="ed-btn" onClick={discard}>Descartar</button> : null}
         <button type="button" className="ed-btn ed-btn--primary" disabled={!dirty || busy} data-busy={busy || undefined} onClick={publish}>{busy ? `Publicando ${Math.min(step + 1, dirtySections.length || 1)}/${dirtySections.length || 1}…` : 'Publicar'}</button>
-        <ProfileMenu dark user={user} onLogout={logout} items={[['Início', () => leave('inicio')], ['Notícias', () => leave('noticias')], ...(user.admin ? [['Acessos', () => leave('acessos')], ['E-mail (Resend)', () => leave('email')]] : []), ['Minha conta', () => leave('senha')]]} />
+        <ProfileMenu dark user={user} onLogout={logout} {...siteMenu} items={[['Início', () => leave('inicio')], ['Notícias', () => leave('noticias')], ...(user.admin ? [['Acessos', () => leave('acessos')], ['E-mail (Resend)', () => leave('email')]] : []), ['Minha conta', () => leave('senha')]]} />
       </header>
 
       <aside className="ed-panel">

@@ -69,7 +69,8 @@ export function Progress({ value, label }) {
 }
 
 // Círculo de perfil com menu: mostra quem está usando o gerenciador.
-export function ProfileMenu({ user, items, onLogout, dark = false }) {
+// `sites`, `site` e `onSite` (opcionais) mostram os sites do grupo para trocar com um clique.
+export function ProfileMenu({ user, items, onLogout, dark = false, sites, site, onSite }) {
   const [open, setOpen] = useState(false);
   const ref = useRef(null);
   const [mounted, shown] = usePresence(open, 140);
@@ -93,6 +94,18 @@ export function ProfileMenu({ user, items, onLogout, dark = false }) {
             <Avatar name={user.name} size={46} />
             <div><b>{user.name}</b><small>{user.email || user.username}</small><span className={`p-badge ${user.admin ? 'p-badge--admin' : ''}`}>{roleName(user)}</span></div>
           </div>
+          {sites && onSite ? (
+            <div className="p-profile-sites" role="group" aria-label="Trocar de site">
+              <small>Sites</small>
+              {sites.map((s) => (
+                <button type="button" role="menuitem" key={s.id} className={s.id === site ? 'is-current' : ''} aria-current={s.id === site ? 'true' : undefined} onClick={() => { setOpen(false); if (s.id !== site) onSite(s.id); }}>
+                  <span className={`p-site-art ${s.logo ? 'p-site-art--logo' : ''}`}><img src={s.logo || s.img} alt="" /></span>
+                  <span>{s.nome}</span>
+                  {s.id === site ? <Ico name="check" size={16} /> : null}
+                </button>
+              ))}
+            </div>
+          ) : null}
           {items.map(([label, action]) => <button type="button" role="menuitem" key={label} onClick={() => { setOpen(false); action(); }}>{label}</button>)}
           <a role="menuitem" href="/" target="_blank" rel="noopener">Ver o site ↗</a>
           <button type="button" role="menuitem" className="p-profile-out" onClick={onLogout}>Sair</button>

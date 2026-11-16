@@ -70,13 +70,22 @@ export default function PainelApp({ storeMode, user, schema, initialContent, ini
   // Navegação com destino composto: 'editor:sobre' abre o editor naquela página; 'noticias:nova' abre o formulário.
   const open = (t) => { if (locked) return; const [name, mode] = t.split(':'); if (name === 'editor' && mode) setEditorPage(mode); setStartNew(name === 'noticias' && mode === 'nova' ? Date.now() : 0); if (name !== 'noticias' || mode === 'nova') setOpenPostId(0); setTab(name); setMenu(false); window.scrollTo(0, 0); };
   const chat = locked ? null : <SupportChat user={user} admin={user.admin} screen={tab === 'editor' ? 'Editar o site' : titles[tab]} goSettings={() => open('suporte')} />;
-  const profileItems = [['Início', () => open('inicio')], ['Minha conta', () => open('senha')], ['Trocar de site', () => chooseSite(null)]];
+  // Troca de site pelo menu do perfil: confirma antes de perder alterações não publicadas.
+  const switchSite = (id) => {
+    if (JSON.stringify(content) !== JSON.stringify(saved)) {
+      if (!window.confirm('Há alterações não publicadas. Trocar de site mesmo assim? Elas serão perdidas.')) return;
+      setContent(saved);
+    }
+    setTab('inicio'); setMenu(false); chooseSite(id);
+  };
+  const siteMenu = locked ? {} : { sites: SITES, site, onSite: switchSite };
+  const profileItems = [['Início', () => open('inicio')], ['Minha conta', () => open('senha')], ['Tela de escolha de sites', () => switchSite(null)]];
 
   if (!locked) {
     if (site === undefined) return <ShellSkeleton />;
     if (site === null) return <Opening user={user} onChoose={chooseSite} />;
     const chosen = SITES.find((x) => x.id === site);
-    if (site !== 'grupoforte' && chosen.url) return <SiteView site={chosen} onBack={() => chooseSite(null)} />;
+    if (site !== 'grupoforte' && chosen.url) return <SiteView site={chosen} onBack={() => chooseSite(null)} menu={<ProfileMenu dark user={user} items={[['Tela de escolha de sites', () => chooseSite(null)]]} onLogout={logout} {...siteMenu} />} />;
     if (site !== 'grupoforte') return <SiteSoon site={chosen} onBack={() => chooseSite(null)} />;
   }
 
@@ -84,7 +93,7 @@ export default function PainelApp({ storeMode, user, schema, initialContent, ini
     return (
       <>
         <NetBar />
-        <Editor schema={schema} content={content} setContent={setContent} saved={saved} setSaved={setSaved} notify={notify} user={user} goTab={open} logout={logout} startPage={editorPage} />
+        <Editor siteMenu={siteMenu} schema={schema} content={content} setContent={setContent} saved={saved} setSaved={setSaved} notify={notify} user={user} goTab={open} logout={logout} startPage={editorPage} />
         {storeMode !== 'mysql' ? <p className="p-error p-aviso ed-aviso" role="alert">Atenção: o banco de dados não está conectado. As alterações se perdem na próxima publicação do site.</p> : null}
         <Toast toast={toast} open={toastOn} />
         {chat}
@@ -115,7 +124,7 @@ export default function PainelApp({ storeMode, user, schema, initialContent, ini
           {storeMode !== 'mysql' ? <span className="p-pill p-pill--bad">Banco desconectado</span> : null}
           <span className="p-top-grow" />
           {!locked ? <button type="button" className="p-btn" onClick={() => open('noticias:nova')}>+ Nova notícia</button> : null}
-          <ProfileMenu user={user} items={locked ? [] : profileItems} onLogout={logout} />
+          <ProfileMenu user={user} items={locked ? [] : profileItems} onLogout={logout} {...siteMenu} />
         </header>
       <main className={`p-main ${tab === 'inicio' ? 'p-main--wide' : ''}`}>
         {storeMode !== 'mysql' ? <p className="p-error p-aviso" role="alert">Atenção: o banco de dados não está conectado. As alterações ficam em um arquivo temporário e se perdem na próxima publicação do site. Avise o suporte.</p> : null}

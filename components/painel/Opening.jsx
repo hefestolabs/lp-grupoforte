@@ -121,7 +121,7 @@ export function SiteSoon({ site, onBack }) {
 }
 
 // Site do grupo que já está no ar, mas ainda não é editado por este painel: mostra a prévia e o link.
-export function SiteView({ site, onBack }) {
+export function SiteView({ site, onBack, menu }) {
 	const [device, setDevice] = useState("desktop");
 	const [loaded, setLoaded] = useState(false);
 	return (
@@ -136,6 +136,7 @@ export function SiteView({ site, onBack }) {
 				<a className="ed-btn ed-btn--primary" href={site.url} target="_blank" rel="noopener">
 					Abrir o site ↗
 				</a>
+				{menu}
 			</header>
 			<p className="sv-note">
 				Este site já está no ar. A edição do conteúdo dele por este painel ainda não está disponível.
