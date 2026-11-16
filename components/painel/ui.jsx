@@ -68,6 +68,25 @@ export function Progress({ value, label }) {
   return <div className="p-progress" role="progressbar" aria-valuemin={0} aria-valuemax={100} aria-valuenow={pct} aria-label={label}><i style={{ transform: `scaleX(${pct / 100})` }} /></div>;
 }
 
+// Alterna entre o tema escuro (padrão) e o claro; a escolha fica salva no navegador.
+export function ThemeToggle() {
+  const [dark, setDark] = useState(true);
+  useEffect(() => { setDark(document.documentElement.dataset.ptheme !== 'light'); }, []);
+  const flip = () => {
+    const next = dark ? 'light' : 'dark';
+    document.documentElement.dataset.ptheme = next;
+    try { localStorage.setItem('gf-tema', next); } catch {}
+    setDark(!dark);
+  };
+  return (
+    <button type="button" className="p-round" aria-label={dark ? 'Usar tema claro' : 'Usar tema escuro'} title={dark ? 'Tema claro' : 'Tema escuro'} onClick={flip}>
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+        {dark ? <><circle cx="12" cy="12" r="4" /><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4" /></> : <path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z" />}
+      </svg>
+    </button>
+  );
+}
+
 // Círculo de perfil com menu: mostra quem está usando o gerenciador.
 // `sites`, `site` e `onSite` (opcionais) mostram os sites do grupo para trocar com um clique.
 export function ProfileMenu({ user, items, onLogout, dark = false, sites, site, onSite }) {

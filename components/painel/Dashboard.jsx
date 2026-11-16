@@ -16,9 +16,9 @@ function Ring({ pct, color, label, count }) {
   return (
     <div className="d-ring">
       <svg width="84" height="84" viewBox="0 0 84 84" role="img" aria-label={`${label}: ${pct}%`}>
-        <circle cx="42" cy="42" r={r} fill="none" stroke="#e6eaef" strokeWidth="8" />
+        <circle cx="42" cy="42" r={r} fill="none" className="d-ring-track" strokeWidth="8" />
         <circle cx="42" cy="42" r={r} fill="none" stroke={color} strokeWidth="8" strokeLinecap="round" strokeDasharray={`${(c * pct) / 100} ${c}`} transform="rotate(-90 42 42)" />
-        <text x="42" y="47" textAnchor="middle" fontSize="15" fontWeight="700" fill="#1d2733">{pct}%</text>
+        <text x="42" y="47" textAnchor="middle" fontSize="15" fontWeight="700" fill="currentColor">{pct}%</text>
       </svg>
       <b>{label}</b><small>{count} notícia{count === 1 ? '' : 's'}</small>
     </div>
@@ -60,10 +60,26 @@ export default function Dashboard({ user, posts, users, go, openPost }) {
 
   return (
     <div className="d">
-      <header className="d-hello">
-        <div><small>{data}</small><h1>{saudacao}, {user.name.split(' ')[0]}</h1><p className="p-muted">Veja como está o site e escolha o que atualizar.</p></div>
-        <button type="button" className="p-btn p-btn--primary" onClick={() => go('editor')}><Ico name="edit" size={16} />Editar o site</button>
-      </header>
+      <div className="d-top">
+        <section className="d-hero">
+          <span className="d-hero-art" aria-hidden="true" />
+          <div className="d-hero-body">
+            <small>{data}</small>
+            <h1 className="d-hello"><span>{saudacao},</span> {user.name.split(' ')[0]}</h1>
+            <p>Veja como está o site e escolha o que atualizar.</p>
+            <div className="d-hero-actions">
+              <button type="button" className="p-btn p-btn--primary" onClick={() => go('editor')}><Ico name="edit" size={16} />Editar o site</button>
+              <button type="button" className="p-btn d-hero-ghost" onClick={() => go('noticias:nova')}>+ Nova notícia</button>
+            </div>
+          </div>
+        </section>
+        <section className="d-card d-quick">
+          <div className="d-card-head"><h2>Páginas do site</h2><a className="d-link" href="/" target="_blank" rel="noopener">Ver o site ↗</a></div>
+          <div className="d-pages">
+            {paginas.map(([id, nome, desc]) => <button type="button" key={id} onClick={() => go(`editor:${id}`)}><span><b>{nome}</b><small>{desc}</small></span><em>Editar <Ico name="arrow" size={14} /></em></button>)}
+          </div>
+        </section>
+      </div>
 
       <div className="d-stats">
         {stats.map(([icon, tone, n, label]) => <div className="d-stat" key={label}><span className={`d-stat-ico d-tone-${tone}`}><Ico name={icon} size={20} /></span><div><b>{n}</b><small>{label}</small></div></div>)}
@@ -102,12 +118,6 @@ export default function Dashboard({ user, posts, users, go, openPost }) {
           {temas.length ? <div className="d-rings">{temas.slice(0, 4).map(([t, n], i) => <Ring key={t} label={t} count={n} color={CORES[i % CORES.length]} pct={Math.round((n / publicadas.length) * 100)} />)}</div> : <p className="d-empty">Publique notícias para ver os temas.</p>}
         </section>
 
-        <section className="d-card">
-          <div className="d-card-head"><h2>Páginas do site</h2><a className="d-link" href="/" target="_blank" rel="noopener">Ver o site ↗</a></div>
-          <div className="d-pages">
-            {paginas.map(([id, nome, desc]) => <button type="button" key={id} onClick={() => go(`editor:${id}`)}><span><b>{nome}</b><small>{desc}</small></span><em>Editar <Ico name="arrow" size={14} /></em></button>)}
-          </div>
-        </section>
 
         <section className="d-card">
           <div className="d-card-head"><h2>{user.admin ? 'Equipe' : 'Seu acesso'}</h2>{user.admin ? <button type="button" className="d-link" onClick={() => go('acessos')}>Gerenciar</button> : null}</div>
