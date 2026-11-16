@@ -711,3 +711,16 @@
 .sv-stage .ed-devices button.is-active { background: #fff; color: var(--p-navy); box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15); }
 .sv .ed-home { display: inline-flex; align-items: center; }
 @media (max-width: 640px) { .sv-stage .ed-devices { display: none; } .sv-stage { padding: 10px; } }
+
+/* ---------- Menu do perfil: troca rápida de site ---------- */
+.p-profile-sites { margin: 0 0 6px; padding: 6px 0; border-bottom: 1px solid var(--p-line); }
+.p-profile-sites > small { display: block; padding: 4px 10px 6px; color: var(--p-muted); font-size: 12px; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; }
+.p-profile-menu .p-profile-sites > button { display: flex; align-items: center; gap: 10px; width: 100%; padding: 6px 10px; border: 0; border-radius: 8px; background: none; color: var(--p-ink); font: inherit; text-align: left; cursor: pointer; }
+.p-profile-menu .p-profile-sites > button:hover { background: #eef1f5; }
+.p-profile-sites > button > span:nth-child(2) { flex: 1; }
+.p-profile-sites > button.is-current { font-weight: 600; color: var(--p-navy); }
+.p-site-art { flex: none; display: flex; align-items: center; justify-content: center; width: 34px; height: 34px; border-radius: 8px; overflow: hidden; background: #0a4f8d; }
+.p-site-art img { width: 100%; height: 100%; object-fit: cover; }
+.p-site-art--logo { background: linear-gradient(150deg, #0d5aa0, #00264a); box-shadow: inset 0 -3px 0 var(--p-orange); }
+.p-site-art--logo img { width: 80%; height: auto; object-fit: contain; }
+.sv-bar .p-profile-menu { color: var(--p-ink); }
