@@ -12,7 +12,7 @@ export default function Footer({ c }) {
             <div className="footer-cols">
               <div className="footer-brand" data-edit="contatos:redes">
                 <h4>GRUPO FORTE</h4>
-                <p>{c.slogan}</p>
+                {c.slogan ? <p>{c.slogan}</p> : null}
                 <ul className="socials">
                   {c.facebook ? <li><a href={c.facebook} target="_blank" rel="noopener"><Icon name="e-fab-facebook" size={25} title="Facebook" /></a></li> : null}
                   {c.vagas ? <li><a href={c.vagas} target="_blank" rel="noopener"><Icon name="e-fab-linkedin" size={25} title="Linkedin" /></a></li> : null}
@@ -23,9 +23,9 @@ export default function Footer({ c }) {
               <div className="footer-contact" data-edit="contatos:contato">
                 <h4 className="footer-title">CONTATO</h4>
                 <ul>
-                  <li><a href={`mailto:${c.email}`}>E-mail: {c.email}</a></li>
-                  <li><a href={c.whatsapp}>Telefone: {c.telefone}</a></li>
-                  <li>{c.endereco}</li>
+                  {c.email ? <li><a href={`mailto:${c.email}`}>E-mail: {c.email}</a></li> : null}
+                  {c.telefone ? <li>{c.whatsapp ? <a href={c.whatsapp}>Telefone: {c.telefone}</a> : `Telefone: ${c.telefone}`}</li> : null}
+                  {c.endereco ? <li>{c.endereco}</li> : null}
                 </ul>
               </div>
               <div className="footer-info">
@@ -41,9 +41,11 @@ export default function Footer({ c }) {
           </div>
         </div>
       </footer>
-      <div className="copyright" data-edit="contatos:rodape">
-        <p>{c.copyright}</p>
-      </div>
+      {c.copyright ? (
+        <div className="copyright" data-edit="contatos:rodape">
+          <p>{c.copyright}</p>
+        </div>
+      ) : null}
     </>
   );
 }

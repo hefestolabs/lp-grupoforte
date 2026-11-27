@@ -116,7 +116,7 @@ export default function Editor({ siteMenu, schema, content, setContent, saved, s
             <button type="button" className="ed-back" onClick={() => setSel(null)}>← Todas as partes</button>
             <h2>{current.group.titulo}</h2>
             <div className="ed-fields">
-              {current.group.campos.map((c) => <Field key={c.key} field={c} value={content[current.section][c.key]} onChange={(v) => change(current.section, c.key, v)} />)}
+              {current.group.campos.map((c) => <Field key={c.key} field={c} hidden={(content[current.section]._ocultos || []).includes(c.key)} onToggleHidden={() => { const h = content[current.section]._ocultos || []; setContent({ ...content, [current.section]: { ...content[current.section], _ocultos: h.includes(c.key) ? h.filter((k) => k !== c.key) : [...h, c.key] } }); }} value={content[current.section][c.key]} onChange={(v) => change(current.section, c.key, v)} />)}
             </div>
             {current.key === 'home:noticias' ? (
               <div className="ed-news">

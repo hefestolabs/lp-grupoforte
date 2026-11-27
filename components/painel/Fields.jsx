@@ -59,7 +59,8 @@ function ListField({ field, value, onChange }) {
   );
 }
 
-export function Field({ field, value, onChange }) {
+// `hidden` e `onToggleHidden` (opcionais): botão para ocultar a informação no site sem apagar o valor.
+export function Field({ field, value, onChange, hidden = false, onToggleHidden }) {
   let control;
   if (field.type === 'image') control = <ImageField value={value || ''} onChange={onChange} />;
   else if (field.type === 'list') control = <ListField field={field} value={value} onChange={onChange} />;
@@ -69,8 +70,17 @@ export function Field({ field, value, onChange }) {
   else control = <input type={field.type === 'url' ? 'text' : 'text'} inputMode={field.type === 'url' ? 'url' : undefined} value={value ?? ''} onChange={(e) => onChange(e.target.value)} placeholder={field.type === 'url' ? 'https://…' : undefined} />;
   const simple = field.type !== 'image' && field.type !== 'list';
   return (
-    <div className={`p-field p-field--${field.type}`}>
+    <div className={`p-field p-field--${field.type} ${hidden ? 'is-hidden' : ''}`}>
+      {onToggleHidden && field.type !== 'number' ? (
+        <button type="button" className="p-hide" aria-pressed={hidden} onClick={onToggleHidden} title={hidden ? 'Voltar a mostrar no site' : 'Deixar de mostrar no site, sem apagar'}>
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+            {hidden ? <><path d="M3 3l18 18" /><path d="M10.6 5.1A10 10 0 0 1 12 5c5.5 0 9 7 9 7a16 16 0 0 1-2.6 3.4M6.6 6.6C4.1 8.3 3 12 3 12s3.5 7 9 7a9.6 9.6 0 0 0 5.4-1.6" /><path d="M9.9 9.9a3 3 0 0 0 4.2 4.2" /></> : <><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z" /><circle cx="12" cy="12" r="3" /></>}
+          </svg>
+          {hidden ? 'Oculto no site · Mostrar' : 'Ocultar no site'}
+        </button>
+      ) : null}
       {simple ? <label>{field.label}{control}</label> : <><span className="p-label">{field.label}</span>{control}</>}
+      {hidden ? <p className="p-hidden-note">Esta informação não aparece no site. O conteúdo continua salvo.</p> : null}
       {field.help ? <p className="p-help">{field.help}</p> : null}
     </div>
   );
