@@ -23,20 +23,24 @@ export default function Header({ nav, whatsapp }) {
               </li>
             ))}
             <li className="nav-cta">
-              <a className="btn btn-cta" href={whatsapp}>
-                <span>Entre em contato</span>
-                <Icon name="e-fas-phone-square-alt" size={16} />
-              </a>
+              {whatsapp ? (
+                <a className="btn btn-cta" href={whatsapp}>
+                  <span>Entre em contato</span>
+                  <Icon name="e-fas-phone-square-alt" size={16} />
+                </a>
+              ) : null}
             </li>
           </ul>
         </nav>
         <button className="nav-toggle" type="button" aria-expanded={open} aria-label={open ? 'Fechar menu' : 'Abrir menu'} onClick={() => setOpen(!open)}>
           <Icon name={open ? 'bar-sort-right' : 'bars'} size={24} />
         </button>
-        <a className="btn btn-cta header-cta" href={whatsapp}>
-          <span>Entre em contato</span>
-          <Icon name="e-fas-phone-square-alt" size={16} />
-        </a>
+        {whatsapp ? (
+          <a className="btn btn-cta header-cta" href={whatsapp}>
+            <span>Entre em contato</span>
+            <Icon name="e-fas-phone-square-alt" size={16} />
+          </a>
+        ) : null}
       </div>
     </header>
   );

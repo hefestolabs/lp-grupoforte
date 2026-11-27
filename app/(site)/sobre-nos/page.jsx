@@ -17,12 +17,12 @@ export default async function SobreNos() {
 
       <section className="sobre">
         <div className="container">
-          <a className="sobre-banner" data-edit="sobre:topo" style={{ backgroundImage: `url(${s.banner})` }} href={s.bannerLink || undefined} aria-label="Assistir ao vídeo institucional" data-reveal />
+          {s.banner ? <a className="sobre-banner" data-edit="sobre:topo" style={{ backgroundImage: `url(${s.banner})` }} href={s.bannerLink || undefined} aria-label="Assistir ao vídeo institucional" data-reveal /> : null}
           <div className="sobre-cols" data-edit="sobre:texto">
             <div className="sobre-texto">
               <Eyebrow className="eyebrow--plain eyebrow--small">Sobre nós</Eyebrow>
-              <h2 data-reveal>{s.titulo}</h2>
-              <div className="sobre-paragrafos" dangerouslySetInnerHTML={{ __html: rich(s.texto) }} />
+              {s.titulo ? <h2 data-reveal>{s.titulo}</h2> : null}
+              {s.texto ? <div className="sobre-paragrafos" dangerouslySetInnerHTML={{ __html: rich(s.texto) }} /> : null}
               <div className="sobre-boxes">
                 {s.destaques.map((d, i) => (
                   <div className={`sobre-box ${i === 0 ? 'sobre-box--fill' : ''}`} key={i} data-reveal style={{ '--d': `${i * 120}ms` }}>
@@ -33,7 +33,7 @@ export default async function SobreNos() {
                 ))}
               </div>
             </div>
-            <div className="sobre-foto" style={{ backgroundImage: `url(${s.foto})` }} data-reveal role="img" aria-label="Unidade industrial do Grupo Forte" />
+            {s.foto ? <div className="sobre-foto" style={{ backgroundImage: `url(${s.foto})` }} data-reveal role="img" aria-label="Unidade industrial do Grupo Forte" /> : null}
           </div>
         </div>
       </section>

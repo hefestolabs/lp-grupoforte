@@ -140,7 +140,7 @@ export default function PainelApp({ storeMode, user, schema, initialContent, ini
               <details className="p-card" key={g.titulo}>
                 <summary>{g.titulo}</summary>
                 <div className="p-card-body">
-                  {g.campos.map((c) => <Field key={c.key} field={c} value={content[tab][c.key]} onChange={(v) => setContent({ ...content, [tab]: { ...content[tab], [c.key]: v } })} />)}
+                  {g.campos.map((c) => <Field key={c.key} field={c} hidden={(content[tab]._ocultos || []).includes(c.key)} onToggleHidden={() => { const h = content[tab]._ocultos || []; setContent({ ...content, [tab]: { ...content[tab], _ocultos: h.includes(c.key) ? h.filter((k) => k !== c.key) : [...h, c.key] } }); }} value={content[tab][c.key]} onChange={(v) => setContent({ ...content, [tab]: { ...content[tab], [c.key]: v } })} />)}
                 </div>
               </details>
             ))}
