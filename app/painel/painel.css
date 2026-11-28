@@ -73,7 +73,10 @@
 .p-icon-btn.p-danger:hover { background: #fdf0ee; color: #b42318; }
 .p-list-body { display: flex; flex-direction: column; gap: 16px; padding: 12px 16px 16px; border-top: 1px solid var(--p-line); }
 
-.p-savebar { position: fixed; left: 248px; right: 0; bottom: 0; z-index: 20; display: flex; align-items: center; justify-content: flex-end; gap: 12px; padding: 12px 32px; border-top: 1px solid var(--p-line); background: rgba(255, 255, 255, 0.96); }
+/* Barra de ações: sticky (não fixed) — fica presa ao rodapé da janela ao rolar e, no fim, para logo depois do último campo,
+   sem cobri-lo. Fixed não serve aqui: a animação de entrada de .p-screen (transform) prende elementos fixed à tela de conteúdo. */
+.p-savebar { position: sticky; bottom: 16px; z-index: 20; display: flex; align-items: center; justify-content: flex-end; gap: 10px; margin-top: 16px; padding: 10px 10px 10px 20px; border: 1px solid var(--p-line); border-radius: 20px; background: rgba(255, 255, 255, 0.94); box-shadow: 0 10px 30px rgba(0, 40, 80, 0.12); -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px); }
+.p-main:has(.p-savebar) { padding-bottom: 16px; }
 .p-savebar span { margin-right: auto; color: var(--p-muted); font-size: 14px; }
 .p-savebar.is-dirty span { color: #9a4a00; font-weight: 600; }
 
@@ -111,7 +114,6 @@
   .p-side.is-open nav { display: flex; margin-top: 12px; max-height: 60vh; }
   .p-side.is-open .p-side-foot { display: flex; margin-top: 12px; }
   .p-main { padding: 24px 16px 120px; }
-  .p-savebar { left: 0; padding: 10px 16px; }
   .p-savebar span { display: none; }
   .p-savebar .p-btn--primary { flex: 1; }
   .p-image { flex-direction: column; align-items: flex-start; }
@@ -204,7 +206,20 @@
 .p-post { display: grid; grid-template-columns: minmax(0, 1fr) 320px; gap: 16px; align-items: start; }
 .p-post-side { display: flex; flex-direction: column; }
 .painel .p-field--title input { padding: 14px; font-family: var(--font-head); font-size: 22px; font-weight: 700; }
-.p-post-main .p-field--textarea:first-of-type textarea, .p-post-main .p-field--title + .p-field textarea { min-height: 320px; }
+.p-post-main .p-field--body textarea { min-height: 320px; }
+.p-req { color: var(--p-orange); font-weight: 700; }
+.p-help--count { display: flex; justify-content: space-between; gap: 12px; }
+.p-count { flex: none; font-variant-numeric: tabular-nums; }
+.p-count.is-full { color: #b42318; font-weight: 600; }
+.p-serp { display: flex; flex-direction: column; gap: 2px; padding: 14px 16px; border: 1px solid var(--p-line); border-radius: 14px; background: var(--p-soft, #f1f3f6); font-size: 14px; overflow-wrap: anywhere; }
+.p-serp small { margin-bottom: 6px; color: var(--p-muted); font-size: 12px; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; }
+.p-serp-url { color: var(--p-muted); font-size: 13px; }
+.p-serp-title { color: var(--p-link, #1a4fd6); font-size: 18px; font-weight: 500; line-height: 1.3; }
+.p-serp-text { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; color: var(--p-muted); }
+.p-linkout { align-self: flex-start; color: var(--p-link, var(--p-navy)); font-size: 14px; font-weight: 600; }
+.p-linkout:hover { text-decoration: underline; }
+.p-field .p-chips { margin-top: 10px; }
+.p-chips button:hover { border-color: var(--p-orange); }
 .p-chips { display: flex; flex-wrap: wrap; gap: 6px; }
 .p-chips button { min-height: 32px; padding: 0 12px; border: 1px solid var(--p-line); border-radius: 99px; background: #fff; font: inherit; font-size: 13px; cursor: pointer; }
 .p-chips button.is-active { border-color: var(--p-navy); background: var(--p-navy); color: #fff; }
@@ -433,8 +448,11 @@
 .sc-item small { color: var(--p-muted); }
 .sc-crm { align-self: flex-start; margin-top: 4px; padding: 2px 8px; border-radius: 99px; background: #e9edf2; color: #45525f; font-size: 12px; font-weight: 600; }
 .sc-crm--enviado { background: #dff3e6; color: #17663a; }
-/* espaço para o botão do chat não cobrir ações no rodapé das telas */
-.p-savebar { padding-right: 96px; }
+/* O botão do chat fica ao lado da barra de ações, nunca por cima: sem o trilho da direita (abaixo de 1280 px),
+   a barra termina antes do botão e os dois ficam alinhados pelo centro. */
+@media (max-width: 1279px) { .p-savebar { margin-right: 62px; } }
+@media (max-width: 860px) { .p-main:has(.p-savebar) { padding-bottom: 16px; } .p-savebar { margin-right: 74px; padding: 10px; } }
+@media (max-width: 520px) { .p-savebar { bottom: 8px; margin-right: 60px; padding: 8px; } .p-main:has(.p-savebar) { padding-bottom: 8px; } }
 .p-toast { bottom: 96px; }
 .p-row-actions { display: flex; flex-wrap: wrap; gap: 8px; }
 .p-row--top { align-items: flex-start; }

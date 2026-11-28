@@ -26,7 +26,6 @@
   .p-side nav button > span { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
   .p-side nav button.is-active { background: var(--p-orange); color: #fff; }
   .p-side-foot { display: none; }
-  .p-savebar { left: 92px; }
   .p-top { padding: 18px 28px 6px; border: 0; background: none; }
   .p-main { padding: 20px 28px 120px; }
   .p-main--wide { max-width: 1320px; }
@@ -101,7 +100,7 @@
 [data-ptheme='dark'] .p-body .p-aviso { border-color: #6b2f2a; background: #2a1518; }
 [data-ptheme='dark'] .p-body .p-ok, [data-ptheme='dark'] .p-body .p-status--ok { background: #0f3a2a; color: #8fe0b5; }
 [data-ptheme='dark'] .p-body .p-status { border-color: var(--p-line); background: var(--p-soft); color: var(--p-ink); }
-[data-ptheme='dark'] .p-body :is(.p-profile-btn, .p-profile-menu, .d-mini, .p-list-item.is-open, .d-col-head i, .p-post-main, .p-post-side, .p-post-box) { border-color: var(--p-line); background: var(--p-card); color: var(--p-ink); }
+[data-ptheme='dark'] .p-body :is(.p-profile-btn, .p-profile-menu, .d-mini, .p-list-item.is-open, .d-col-head i) { border-color: var(--p-line); background: var(--p-card); color: var(--p-ink); }
 [data-ptheme='dark'] .p-body .p-profile-menu { background: #0f2d4f; box-shadow: 0 18px 44px rgba(0, 0, 0, 0.5); }
 [data-ptheme='dark'] .p-body :is(.d-col, .p-list-item, .p-tag, .p-badge, .p-chips button, .d-speed-head) { background: var(--p-soft); color: var(--p-ink); }
 [data-ptheme='dark'] .p-body .p-badge { color: #c5d3e2; }
@@ -121,7 +120,11 @@
 [data-ptheme='dark'] .p-body .d-tone-orange { background: #43260a; color: #ffb066; }
 [data-ptheme='dark'] .p-body .d-tone-blue { background: #123a66; color: #9ccbff; }
 [data-ptheme='dark'] .p-body .d-tone-navy { background: #1b4a7e; color: #fff; }
-[data-ptheme='dark'] .p-body .p-savebar { border-color: var(--p-line); background: rgba(8, 30, 54, 0.92); }
+[data-ptheme='dark'] .p-body .p-savebar { border-color: var(--p-line); background: rgba(11, 36, 64, 0.9); box-shadow: 0 14px 34px rgba(0, 0, 0, 0.4); }
+[data-ptheme='dark'] .p-body .p-chips button.is-active { border-color: var(--p-orange); background: var(--p-orange); color: #fff; }
+[data-ptheme='dark'] .p-body .p-count.is-full { color: #ff9c92; }
+/* Controles nativos (ícone do calendário, lista do select, barras de rolagem) no tom escuro */
+[data-ptheme='dark'] .p-body { color-scheme: dark; }
 [data-ptheme='dark'] .p-body .p-savebar.is-dirty span { color: #ffb066; }
 [data-ptheme='dark'] .p-body .p-pill--bad { background: #3a1a1a; color: #ff9c92; }
 [data-ptheme='dark'] .p-body .sk { background: linear-gradient(90deg, #0f2d4f 25%, #173d68 45%, #0f2d4f 65%) 0 0 / 300% 100%; }

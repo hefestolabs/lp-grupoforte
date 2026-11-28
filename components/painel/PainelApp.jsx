@@ -1,6 +1,7 @@
 'use client';
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useId, useMemo, useRef, useState } from 'react';
 import { api } from './api';
+import { slugify } from '@/lib/slug';
 import { Field } from './Fields';
 import dynamic from 'next/dynamic';
 import Dashboard from './Dashboard';
@@ -198,17 +199,38 @@ function Inicio({ go, posts, schema, user }) {
   );
 }
 
+// Campo de texto do formulário de notícia: limite de caracteres com contador e ajuda ligada ao campo.
+function PostText({ label, value, onChange, max, count = true, help, required, area, rows, placeholder, className = '', inputRef, error }) {
+  const id = useId();
+  const n = (value || '').length;
+  const Tag = area ? 'textarea' : 'input';
+  return (
+    <div className={`p-field ${className}`}>
+      <label>{label}{required ? <span className="p-req" aria-hidden="true"> *</span> : null}
+        <Tag ref={inputRef} value={value ?? ''} onChange={(e) => onChange(e.target.value)} maxLength={max} rows={rows} placeholder={placeholder} aria-required={required || undefined} aria-invalid={error ? true : undefined} aria-describedby={`${id}-h`} />
+      </label>
+      {error ? <p className="p-error" role="alert">{error}</p> : null}
+      <p className="p-help p-help--count" id={`${id}-h`}><span>{help}</span>{max && count ? <span className={`p-count ${n >= max ? 'is-full' : ''}`}>{n}/{max}</span> : null}</p>
+    </div>
+  );
+}
+
 function Noticias({ posts, setPosts, notify, startNew, openId }) {
   const [edit, setEdit] = useState(null);
   const [busy, setBusy] = useState(false);
+  const [semTitulo, setSemTitulo] = useState(false);
+  const [host, setHost] = useState('');
+  const tituloRef = useRef(null);
   const categorias = useMemo(() => [...new Set(posts.map((p) => p.categories[0]?.name).filter(Boolean))], [posts]);
-  const novo = () => setEdit({ title: '', category: '', date: hoje(), image: '', imageAlt: '', excerpt: '', content: '', status: 'publicado', slug: '' });
-  const abrir = (p) => setEdit({ id: p.id, title: p.title, category: p.categories[0]?.name || '', date: p.date.slice(0, 10), time: p.date.slice(11, 19), image: p.image?.src || '', imageAlt: p.image?.alt || '', excerpt: p.excerpt, content: p.content, status: p.status, slug: p.slug });
-  const set = (k) => (v) => setEdit((e) => ({ ...e, [k]: v }));
+  const novo = () => { setSemTitulo(false); setEdit({ title: '', category: '', date: hoje(), image: '', imageAlt: '', excerpt: '', content: '', status: 'publicado', slug: '' }); };
+  const abrir = (p) => { setSemTitulo(false); setEdit({ id: p.id, title: p.title, category: p.categories[0]?.name || '', date: p.date.slice(0, 10), time: p.date.slice(11, 19), image: p.image?.src || '', imageAlt: p.image?.alt || '', excerpt: p.excerpt, content: p.content, status: p.status, slug: p.slug }); };
+  const set = (k) => (v) => { if (k === 'title' && v.trim()) setSemTitulo(false); setEdit((e) => ({ ...e, [k]: v })); };
+  useEffect(() => { setHost(window.location.host); }, []);
   useEffect(() => { if (startNew) novo(); }, [startNew]);
   useEffect(() => { const p = posts.find((x) => x.id === openId); if (p) abrir(p); }, [openId]);
   async function reload() { setPosts(await api('posts')); }
   async function salvar() {
+    if (!edit.title.trim()) { setSemTitulo(true); tituloRef.current?.focus(); return; }
     setBusy(true);
     try {
       const data = { ...edit, date: `${edit.date}T${edit.time || '12:00:00'}` };
@@ -225,40 +247,62 @@ function Noticias({ posts, setPosts, notify, startNew, openId }) {
   }
 
   if (edit) {
-    const t = (label, key, extra = {}) => ({ field: { key, label, type: 'text', ...extra }, value: edit[key], onChange: set(key) });
+    const original = edit.id ? posts.find((p) => p.id === edit.id) : null;
+    const endereco = slugify(edit.slug || original?.slug || edit.title);
+    const noSite = original?.status === 'publicado' ? `/${original.slug}/` : '';
+    const publicada = edit.status === 'publicado';
     return (
       <>
-        <header className="p-head p-head--row"><div><h1>{edit.id ? 'Editar notícia' : 'Nova notícia'}</h1></div><button type="button" className="p-btn p-btn--ghost" onClick={() => setEdit(null)}>← Voltar</button></header>
+        <header className="p-head p-head--row">
+          <div><h1>{edit.id ? 'Editar notícia' : 'Nova notícia'}</h1><p className="p-muted">Só o título é obrigatório (<span className="p-req">*</span>). Embaixo de cada campo está onde ele aparece no site.</p></div>
+          <button type="button" className="p-btn p-btn--ghost" onClick={() => setEdit(null)}>← Voltar</button>
+        </header>
         <div className="p-post">
           <div className="p-post-main">
             <div className="p-card p-card--open"><div className="p-card-body">
-              <div className="p-field p-field--title"><label>Título<input value={edit.title} onChange={(e) => set('title')(e.target.value)} placeholder="Digite o título da notícia" /></label></div>
-              <Field {...t('Texto', 'content', { type: 'textarea', help: 'Linha em branco separa parágrafos. Use **assim** para negrito.' })} />
-              <Field {...t('Resumo', 'excerpt', { type: 'textarea', help: 'Opcional. Uma ou duas frases; aparece nos buscadores.' })} />
+              <PostText className="p-field--title" label="Título" required max={200} value={edit.title} onChange={set('title')} inputRef={tituloRef} error={semTitulo ? 'Escreva o título da notícia antes de salvar.' : ''} placeholder="Digite o título da notícia" help="Aparece no cartão da notícia e no topo da página dela." />
+              <PostText className="p-field--body" area count={false} label="Texto" max={20000} value={edit.content} onChange={set('content')} placeholder="Escreva a notícia aqui." help="O corpo da notícia, na página dela. Deixe uma linha em branco entre parágrafos e use **assim** para negrito." />
+            </div></div>
+            <div className="p-card p-card--open"><div className="p-card-body">
+              <div><h2>Busca e link</h2><p className="p-help">Como a notícia aparece no Google e o endereço dela no site.</p></div>
+              <PostText area rows={3} label="Resumo" max={300} value={edit.excerpt} onChange={set('excerpt')} placeholder="Uma ou duas frases sobre a notícia." help="Opcional. Aparece no Google e em outros buscadores, abaixo do título." />
+              <PostText count={false} label="Final do endereço" max={80} value={edit.slug} onChange={set('slug')} placeholder={slugify(edit.title) || 'criado-a-partir-do-titulo'} help={edit.id ? 'Mudar o endereço quebra links que já foram compartilhados.' : 'Criado a partir do título. Só preencha se quiser outro.'} />
+              <div className="p-serp" aria-label="Prévia no Google">
+                <small>Prévia no Google</small>
+                <span className="p-serp-url">{host || 'site'} › {endereco || '…'}</span>
+                <b className="p-serp-title">{edit.title.trim() || 'Título da notícia'}</b>
+                <span className="p-serp-text">{(edit.excerpt.trim() || edit.content.replace(/\*\*/g, '').trim()).slice(0, 160) || 'O resumo aparece aqui.'}</span>
+              </div>
             </div></div>
           </div>
           <aside className="p-post-side">
             <div className="p-card p-card--open"><div className="p-card-body">
               <h2>Publicação</h2>
-              <div className="p-field"><label>Situação<select value={edit.status} onChange={(e) => set('status')(e.target.value)}><option value="publicado">Publicada no site</option><option value="rascunho">Rascunho (não aparece)</option></select></label></div>
-              <div className="p-field"><label>Data<input type="date" value={edit.date} onChange={(e) => set('date')(e.target.value)} /></label></div>
+              <div className="p-field"><label>Situação<select value={edit.status} onChange={(e) => set('status')(e.target.value)}><option value="publicado">Publicada no site</option><option value="rascunho">Rascunho (não aparece)</option></select></label><p className="p-help">{publicada ? 'Aparece no site assim que você salvar.' : 'Fica guardada só aqui no painel, fora do site.'}</p></div>
+              <div className="p-field"><label>Data<input type="date" value={edit.date} onChange={(e) => set('date')(e.target.value)} /></label><p className="p-help">Aparece na notícia e define a ordem: as 3 mais recentes vão para a página inicial.</p></div>
+              {noSite ? <a className="p-linkout" href={noSite} target="_blank" rel="noopener">Ver a notícia no site ↗</a> : null}
             </div></div>
             <div className="p-card p-card--open"><div className="p-card-body">
               <h2>Tema</h2>
-              <div className="p-field"><label>Tema (categoria)<input list="p-cats" value={edit.category} onChange={(e) => set('category')(e.target.value)} placeholder="Ex.: Argaforte" /></label><datalist id="p-cats">{categorias.map((c) => <option key={c} value={c} />)}</datalist><p className="p-help">Escolha um existente ou digite um novo.</p></div>
-              {categorias.length ? <div className="p-chips">{categorias.map((c) => <button type="button" key={c} className={edit.category === c ? 'is-active' : ''} onClick={() => set('category')(c)}>{c}</button>)}</div> : null}
+              <div className="p-field">
+                <label>Tema da notícia<input list="p-cats" maxLength={80} value={edit.category} onChange={(e) => set('category')(e.target.value)} placeholder="Ex.: Argaforte" /></label>
+                <datalist id="p-cats">{categorias.map((c) => <option key={c} value={c} />)}</datalist>
+                {categorias.length ? <div className="p-chips" role="group" aria-label="Temas já usados">{categorias.map((c) => <button type="button" key={c} aria-pressed={edit.category === c} className={edit.category === c ? 'is-active' : ''} onClick={() => set('category')(edit.category === c ? '' : c)}>{c}</button>)}</div> : null}
+                <p className="p-help">Clique em um tema já usado ou digite um novo. O tema aparece no cartão e na notícia, e cada tema tem uma página com as notícias dele.</p>
+              </div>
             </div></div>
             <div className="p-card p-card--open"><div className="p-card-body">
               <h2>Imagem de capa</h2>
-              <Field {...t('Imagem', 'image', { type: 'image', help: 'Horizontal (ex.: 1920×1080).' })} />
-              <Field {...t('Descrição da imagem', 'imageAlt', { help: 'Para leitores de tela e buscadores.' })} />
+              <Field field={{ key: 'image', label: 'Imagem', type: 'image', help: 'Aparece no cartão e no topo da notícia. Use foto horizontal (ex.: 1920×1080) em JPG, PNG, WebP ou GIF, até 6 MB.' }} value={edit.image} onChange={set('image')} />
+              <PostText label="Descrição da imagem" max={200} value={edit.imageAlt} onChange={set('imageAlt')} placeholder="Ex.: Lata de tinta sobre piso de madeira" help="Diga o que aparece na foto. Ajuda quem usa leitor de tela e o Google. Se ficar vazia, vale o título." />
             </div></div>
-            {edit.id ? <div className="p-card p-card--open"><div className="p-card-body"><Field {...t('Endereço da página', 'slug', { help: 'Mudar o endereço quebra links já compartilhados.' })} /></div></div> : null}
           </aside>
         </div>
-        <div className="p-savebar is-dirty">
-          {edit.id ? <button type="button" className="p-btn p-btn--danger" disabled={busy} onClick={excluir}>Excluir</button> : <span />}
-          <button type="button" className="p-btn p-btn--primary" disabled={busy} data-busy={busy || undefined} onClick={salvar}>{busy ? 'Salvando…' : edit.status === 'publicado' ? (edit.id ? 'Atualizar notícia' : 'Publicar notícia') : 'Salvar rascunho'}</button>
+        {/* Barra fixa ao rolar (sticky), dentro da coluna de conteúdo: nunca cobre o último campo. */}
+        <div className="p-savebar">
+          <span>{!publicada ? 'Rascunho: fica só no painel' : original?.status === 'publicado' ? 'No ar no site' : 'Vai para o site ao salvar'}</span>
+          {edit.id ? <button type="button" className="p-btn p-btn--danger" disabled={busy} onClick={excluir}>Excluir</button> : null}
+          <button type="button" className="p-btn p-btn--primary" disabled={busy} data-busy={busy || undefined} onClick={salvar}>{busy ? 'Salvando…' : publicada ? (edit.id ? 'Atualizar notícia' : 'Publicar notícia') : 'Salvar rascunho'}</button>
         </div>
       </>
     );
