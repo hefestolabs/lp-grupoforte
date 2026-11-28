@@ -116,7 +116,7 @@ export default function SupportChat({ user, screen, admin, goSettings }) {
         </section>
       ) : null}
       <button type="button" className="sc-fab" aria-expanded={open} aria-label={open ? 'Fechar o suporte' : 'Abrir o suporte'} onClick={() => setOpen(!open)}>
-        {open ? <span aria-hidden="true">✕</span> : <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M21 12a8.5 8.5 0 0 1-12.6 7.4L3 21l1.7-5.2A8.5 8.5 0 1 1 21 12z" /><path d="M8.5 11h.01M12 11h.01M15.5 11h.01" /></svg>}
+        {open ? <span aria-hidden="true">✕</span> : <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M21 12a8.5 8.5 0 0 1-12.6 7.4L3 21l1.7-5.2A8.5 8.5 0 1 1 21 12z" /></svg>}
       </button>
     </div>
   );
